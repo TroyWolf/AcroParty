@@ -1,5 +1,7 @@
 # AcroParty 🎉
 
+> **Work in Progress** — This game is actively being developed. Expect rough edges, missing features, and frequent changes.
+
 **Play now at [acroparty.com](https://acroparty.com)**
 
 A free, multiplayer word party game inspired by the classic 90s internet game **Acrophobia**. Get a random acronym, make up something hilarious (or clever) that it stands for, and vote for your favorite. No downloads, no accounts — just grab some friends and play.
