@@ -1,0 +1,100 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 32px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.title {
+  font-size: 64px;
+  color: var(--accent);
+  text-shadow: 0 0 30px var(--accent);
+  letter-spacing: 8px;
+  animation: zoomIn 0.5s ease;
+}
+
+.mvp {
+  background: linear-gradient(135deg, #333300, #666600);
+  border: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 20px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.mvpLabel {
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+.mvpName {
+  font-size: 36px;
+  color: var(--accent);
+  font-family: var(--font-display);
+}
+
+.mvpScore {
+  color: var(--text-dim);
+  font-size: 18px;
+}
+
+.scoreboard {
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.scoreTitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.scoreRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg-panel);
+}
+
+.scoreRow.mine {
+  color: var(--accent2);
+}
+
+.rank {
+  width: 32px;
+  font-size: 18px;
+}
+
+.name { flex: 1; }
+
+.score {
+  color: var(--accent2);
+  font-weight: bold;
+}
+
+.waiting {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

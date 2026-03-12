@@ -1,0 +1,114 @@
+@import './theme.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-main);
+  font-size: 15px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-size: 14px;
+  background: var(--btn-bg);
+  color: var(--text);
+  border: 2px solid var(--btn-border);
+  border-radius: var(--radius);
+  padding: 8px 18px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+button:hover:not(:disabled) {
+  background: var(--btn-hover);
+  border-color: var(--accent2);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--accent);
+  color: #000;
+  border-color: #cccc00;
+  font-weight: bold;
+}
+
+button.primary:hover:not(:disabled) {
+  background: #ffff44;
+  border-color: var(--accent);
+}
+
+button.danger {
+  background: var(--danger);
+  border-color: #cc0000;
+}
+
+input, textarea {
+  background: var(--bg-dark);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-family: var(--font-main);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+input:focus, textarea:focus {
+  border-color: var(--accent2);
+}
+
+select {
+  background: var(--bg-dark);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-family: var(--font-main);
+  font-size: 14px;
+  outline: none;
+}
+
+select:focus {
+  border-color: var(--accent2);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+.error-msg {
+  color: var(--danger);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }

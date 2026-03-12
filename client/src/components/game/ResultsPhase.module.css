@@ -1,0 +1,161 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.roundInfo {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.acronymSmall {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.letter {
+  font-family: var(--font-display);
+  font-size: 36px;
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  min-width: 32px;
+  text-align: center;
+}
+
+.winnerBanner {
+  background: linear-gradient(135deg, #333300, #666600);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: slideIn 0.4s ease;
+}
+
+.winnerLabel {
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.winnerName {
+  font-size: 22px;
+  color: var(--accent);
+  font-family: var(--font-display);
+}
+
+.winnerText {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.answerCard {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+}
+
+.answerCard.winner {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, #1a1a00, #2a2a00);
+}
+
+.answerTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.nickname {
+  flex: 1;
+  color: var(--accent2);
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.votes {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.delta {
+  color: var(--success);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.answerText {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.scoreboard {
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.scoreTitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.scoreRow {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  gap: 10px;
+  border-bottom: 1px solid var(--bg-panel);
+}
+
+.rank {
+  color: var(--text-muted);
+  font-size: 12px;
+  width: 24px;
+}
+
+.scoreName {
+  flex: 1;
+}
+
+.scoreVal {
+  color: var(--accent2);
+  font-weight: bold;
+}
+
+.next {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-10px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}

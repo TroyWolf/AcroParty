@@ -1,0 +1,33 @@
+:root {
+  /* Retro Acrophobia palette */
+  --bg:           #000080;   /* classic cobalt blue */
+  --bg-dark:      #00005a;
+  --bg-panel:     #000050;
+  --border:       #4444cc;
+  --border-light: #8888ff;
+
+  --text:         #ffffff;
+  --text-dim:     #aaaadd;
+  --text-muted:   #7777aa;
+
+  --accent:       #ffff00;   /* yellow — classic game highlight */
+  --accent2:      #00ffff;   /* cyan */
+  --accent3:      #ff8800;   /* orange for warnings/timers */
+  --success:      #00ff88;
+  --danger:       #ff4444;
+
+  --btn-bg:       #0000cc;
+  --btn-hover:    #2222ee;
+  --btn-border:   #8888ff;
+
+  --card-bg:      #000066;
+  --card-hover:   #0000aa;
+
+  --chat-bg:      #00003a;
+
+  --font-main: 'Courier New', Courier, monospace;
+  --font-display: Impact, 'Arial Narrow', Arial, sans-serif;
+
+  --radius: 4px;
+  --transition: 150ms ease;
+}

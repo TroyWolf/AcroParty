@@ -1,0 +1,53 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  padding: 32px;
+  animation: fadeIn 0.4s ease;
+}
+
+.roundLabel {
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.categoryLabel {
+  color: var(--text-dim);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.categoryName {
+  font-size: 56px;
+  color: var(--accent2);
+  text-align: center;
+  text-shadow: 0 0 20px var(--accent2);
+  animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hint {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 14px;
+}
+
+.preparing {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

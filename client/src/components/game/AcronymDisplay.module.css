@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.letter {
+  font-family: var(--font-display);
+  font-size: 72px;
+  color: var(--accent);
+  text-shadow: 0 0 30px var(--accent), 0 0 60px rgba(255,255,0,0.3);
+  line-height: 1;
+  min-width: 64px;
+  text-align: center;
+  border-bottom: 4px solid var(--accent);
+  padding-bottom: 4px;
+}
+
+@media (max-width: 600px) {
+  .letter { font-size: 48px; min-width: 44px; }
+}
