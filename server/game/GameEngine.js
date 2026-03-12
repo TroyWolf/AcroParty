@@ -1,4 +1,4 @@
-import { createRoundState, serializePlayer } from './Room.js';
+import { createRoundState } from './Room.js';
 import { generateAcronym } from './AcronymGenerator.js';
 import { pickCategory } from './CategoryData.js';
 import { GAME, SCORING } from '../config.js';
@@ -129,10 +129,10 @@ export function transitionPhase(room, phase) {
       }
 
       if (subs.length === 1) {
-        // Only 1 submission — skip voting, auto-award bonus
+        // Only 1 submission — skip voting, award Winner's Bonus for the round
         const [socketId] = subs[0];
         const p = room.players.get(socketId);
-        if (p) p.score += SCORING.SUBMISSION_BONUS;
+        if (p) p.score += rs.acronym.length * SCORING.WINNERS_BONUS_PER_LETTER;
 
         emit(room, 'game:phase_change', {
           phase: 'voting',
@@ -255,19 +255,48 @@ function calculateScores(room) {
       .map(([id]) => id)
   );
 
-  // Award points for votes received + submission bonus
+  // Speed bonus: earliest submission that received at least one vote
+  let speedBonusRecipient = null;
+  let earliestVotedTime = Infinity;
+  for (const [socketId, sub] of rs.submissions) {
+    if ((voteCounts.get(socketId) ?? 0) > 0 && sub.submittedAt < earliestVotedTime) {
+      earliestVotedTime = sub.submittedAt;
+      speedBonusRecipient = socketId;
+    }
+  }
+
+  // Winner's Bonus recipient: most votes; tie → earliest submitter
+  // Penalty: if that player didn't vote, they forfeit the Winner's Bonus
+  let winnersBonusRecipient = null;
+  if (winnerSocketIds.size > 0) {
+    let earliest = Infinity;
+    for (const socketId of winnerSocketIds) {
+      const sub = rs.submissions.get(socketId);
+      if (sub && sub.submittedAt < earliest) {
+        earliest = sub.submittedAt;
+        winnersBonusRecipient = socketId;
+      }
+    }
+    const winner = room.players.get(winnersBonusRecipient);
+    if (winner && !winner.hasVoted) {
+      winnersBonusRecipient = null; // forfeited for not voting
+    }
+  }
+
+  // Award points: 1 pt per vote + Speed Bonus + Winner's Bonus
   for (const [socketId, sub] of rs.submissions) {
     const p = room.players.get(socketId);
     if (!p) continue;
 
     const votes = voteCounts.get(socketId) ?? 0;
-    let delta = SCORING.SUBMISSION_BONUS;
-    delta += votes * SCORING.VOTES_PER_VOTE_RECEIVED;
+    let delta = votes * SCORING.VOTES_PER_VOTE_RECEIVED;
 
-    // Speed bonus
-    const elapsed = (sub.submittedAt - rs.phaseStartedAt) / 1000;
-    if (elapsed <= SCORING.SPEED_BONUS_THRESHOLD_SECONDS) {
+    if (socketId === speedBonusRecipient) {
       delta += SCORING.SPEED_BONUS_POINTS;
+    }
+
+    if (socketId === winnersBonusRecipient) {
+      delta += rs.acronym.length * SCORING.WINNERS_BONUS_PER_LETTER;
     }
 
     p.score += delta;
@@ -289,7 +318,7 @@ function calculateScores(room) {
     });
   }
 
-  // Award bonus to voters who picked a winner
+  // Award 1 pt to voters who picked a winner
   for (const [voterSocketId, anonId] of rs.votes) {
     const targetSocketId = rs.anonMap.get(anonId);
     if (targetSocketId && winnerSocketIds.has(targetSocketId)) {
@@ -360,18 +389,9 @@ export function handleVote(room, voterSocketId, anonId) {
   rs.votes.set(voterSocketId, anonId);
   voter.hasVoted = true;
 
-  const eligible = activePlayers(room).filter(p => {
-    // Only players who submitted AND didn't submit that answer can vote
-    return rs.submissions.has(p.socketId) || true; // all active players can vote
-  });
   const total = activePlayers(room).length;
   const count = rs.votes.size;
   emit(room, 'game:vote_count', { count, total });
-
-  // If everyone has voted, advance early
-  const maxVoters = activePlayers(room).filter(p => rs.submissions.has(p.socketId) ?
-    rs.submissions.size > 1 : rs.submissions.size > 0
-  ).length;
 
   if (count >= activePlayers(room).length) {
     transitionPhase(room, 'results');

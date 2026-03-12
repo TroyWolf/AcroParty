@@ -16,9 +16,8 @@ export const GAME = {
 };
 
 export const SCORING = {
-  VOTES_PER_VOTE_RECEIVED: 5,
-  VOTED_FOR_WINNER_BONUS: 3,
-  SUBMISSION_BONUS: 1,
-  SPEED_BONUS_THRESHOLD_SECONDS: 15,
-  SPEED_BONUS_POINTS: 2,
+  VOTES_PER_VOTE_RECEIVED: 1,       // 1 pt per vote received (all players)
+  SPEED_BONUS_POINTS: 2,            // fastest submission that gets a vote
+  WINNERS_BONUS_PER_LETTER: 1,      // Winner's Bonus = acronym.length pts
+  VOTED_FOR_WINNER_BONUS: 1,        // 1 pt for voting for the round winner
 };
