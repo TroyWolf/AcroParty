@@ -1,29 +1,29 @@
 :root {
-  /* Retro Acrophobia palette */
-  --bg:           #000080;   /* classic cobalt blue */
-  --bg-dark:      #00005a;
-  --bg-panel:     #000050;
-  --border:       #4444cc;
-  --border-light: #8888ff;
+  /* Near-black with dark blue tint — original Acrophobia look */
+  --bg:           #08080f;
+  --bg-dark:      #04040a;
+  --bg-panel:     #06060e;
+  --border:       #1a2860;
+  --border-light: #2a3a80;
 
-  --text:         #ffffff;
-  --text-dim:     #aaaadd;
-  --text-muted:   #7777aa;
+  --text:         #e0e0e0;
+  --text-dim:     #a0a8c0;
+  --text-muted:   #50608a;
 
-  --accent:       #ffff00;   /* yellow — classic game highlight */
+  --accent:       #ffff00;   /* yellow — winner highlight */
   --accent2:      #00ffff;   /* cyan */
-  --accent3:      #ff8800;   /* orange for warnings/timers */
-  --success:      #00ff88;
-  --danger:       #ff4444;
+  --accent3:      #ff8800;   /* orange */
+  --success:      #44ff44;   /* lime green — player names */
+  --danger:       #ff2200;   /* bright red — acronym, vote boxes, timer */
 
-  --btn-bg:       #0000cc;
-  --btn-hover:    #2222ee;
-  --btn-border:   #8888ff;
+  --btn-bg:       #0a0a40;
+  --btn-hover:    #18186a;
+  --btn-border:   #3040a0;
 
-  --card-bg:      #000066;
-  --card-hover:   #0000aa;
+  --card-bg:      #08081a;
+  --card-hover:   #101030;
 
-  --chat-bg:      #00003a;
+  --chat-bg:      #04040c;
 
   --font-main: 'Courier New', Courier, monospace;
   --font-display: Impact, 'Arial Narrow', Arial, sans-serif;

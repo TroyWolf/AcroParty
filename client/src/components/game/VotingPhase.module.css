@@ -1,8 +1,8 @@
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 24px;
+  gap: 16px;
+  padding: 20px 24px;
   height: 100%;
   overflow-y: auto;
 }
@@ -11,26 +11,31 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  flex-wrap: wrap;
 }
 
-.roundInfo {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-transform: uppercase;
+.phaseLabel {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--text);
   letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.category {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text);
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .instructions {
-  text-align: center;
   color: var(--accent2);
-  font-size: 15px;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 
 .voteCount {
-  text-align: center;
   color: var(--text-muted);
   font-size: 13px;
 }
@@ -38,34 +43,41 @@
 .answers {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .answerCard {
-  background: var(--card-bg);
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 6px 0;
   text-align: left;
-  font-size: 16px;
-  transition: background var(--transition), border-color var(--transition), transform 0.1s;
+  font-size: 15px;
   cursor: pointer;
   width: 100%;
+  transition: background var(--transition);
+  border-bottom: 1px solid rgba(26, 40, 96, 0.4);
 }
 
 .answerCard:hover:not(:disabled) {
-  background: var(--card-hover);
-  border-color: var(--accent2);
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .answerCard:disabled {
   cursor: default;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .answerText {
   color: var(--text);
+  flex: 1;
+  text-align: left;
+  padding: 0 12px;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 .noSubs, .moving {

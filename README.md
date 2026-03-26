@@ -30,6 +30,9 @@ The player who gets the most votes wins the round. Players who voted for the win
 
 Acrophobia was created by **Matt Toschlog** and launched in 1997 on the now-defunct **heat.net** gaming platform. At its peak it had tens of thousands of daily players and was one of the most popular online multiplayer games of its era — long before the age of social media, Discord, or group video calls.
 
+A video showing the original game
+https://youtu.be/v8UVyXoWUfo?si=wh2pZkvXnyDG6JGE
+
 What made it special was the formula: no reaction time, no hand-eye coordination required. Just wit, wordplay, and the ability to make strangers on the internet laugh. It was one of the first games where the *other players' creativity* was the entertainment. The chat between rounds kept tables lively, and regulars formed tight communities around their favorite rooms.
 
 After Heat.net shut down in 2001, GameSpy briefly hosted Acrophobia before it, too, went dark. Fans have been trying to recreate the magic ever since — including this project.

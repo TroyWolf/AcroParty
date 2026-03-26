@@ -1,7 +1,7 @@
 import RoomManager from '../game/RoomManager.js';
 import { createPlayer, serializeRoom, serializePlayer } from '../game/Room.js';
 import { sanitizeNickname } from '../utils/sanitize.js';
-import { broadcastSystemChat, handleDisconnect } from '../game/GameEngine.js';
+import { broadcastSystemChat, handleDisconnect, checkMinPlayers } from '../game/GameEngine.js';
 import { GAME } from '../config.js';
 import { CATEGORIES } from '../game/CategoryData.js';
 
@@ -50,7 +50,7 @@ export function registerRoomHandlers(io, socket) {
     }
 
     if (asSpectator || inProgress) {
-      room.spectators.add(socket.id);
+      room.spectators.set(socket.id, clean);
       socket.roomCode = room.code;
       socket.join(room.code);
 
@@ -147,6 +147,7 @@ export function leaveRoom(io, socket) {
     room.players.delete(socket.id);
     io.to(room.code).emit('room:player_left', { socketId: socket.id, nickname: player.nickname });
     broadcastSystemChat(room, `${player.nickname} left the room.`);
+    checkMinPlayers(room);
 
     // Transfer host if needed
     if (room.hostSocketId === socket.id) {

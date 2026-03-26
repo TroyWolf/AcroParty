@@ -1,4 +1,4 @@
-import { createRoundState } from './Room.js';
+import { createRoundState, serializeRoom } from './Room.js';
 import { generateAcronym } from './AcronymGenerator.js';
 import { pickCategory } from './CategoryData.js';
 import { GAME, SCORING } from '../config.js';
@@ -400,6 +400,31 @@ export function handleVote(room, voterSocketId, anonId) {
   return { ok: true };
 }
 
+function returnToLobby(room) {
+  if (room.currentRoundState?.timerHandle) {
+    clearTimeout(room.currentRoundState.timerHandle);
+  }
+  room.phase = 'lobby';
+  room.currentRound = 0;
+  room.currentRoundState = null;
+  room.rounds = [];
+  for (const p of room.players.values()) {
+    p.score = 0;
+    p.hasSubmitted = false;
+    p.hasVoted = false;
+  }
+  broadcastSystemChat(room, 'Not enough players to continue. Returning to lobby.');
+  emit(room, 'game:phase_change', { phase: 'lobby', room: serializeRoom(room) });
+  RoomManager.touch(room);
+}
+
+export function checkMinPlayers(room) {
+  const inGame = !['lobby', 'game_over'].includes(room.phase);
+  if (inGame && activePlayers(room).length < 2) {
+    returnToLobby(room);
+  }
+}
+
 export function handleDisconnect(room, socketId) {
   const player = room.players.get(socketId);
   if (!player) {
@@ -424,6 +449,7 @@ export function handleDisconnect(room, socketId) {
 
   broadcastSystemChat(room, `${player.nickname} lost connection.`);
   emit(room, 'room:player_left', { socketId, nickname: player.nickname });
+  checkMinPlayers(room);
 
   // Schedule removal if they don't reconnect
   setTimeout(() => {

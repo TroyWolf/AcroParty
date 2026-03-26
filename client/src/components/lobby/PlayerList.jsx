@@ -7,6 +7,7 @@ export default function PlayerList() {
   const { state } = useGame();
   const isHost = state.me?.isHost;
   const inLobby = state.phase === 'lobby';
+  const scores = state.round?.currentScores ?? {};
 
   function kick(targetSocketId) {
     socket.emit(EVENTS.HOST_KICK, { targetSocketId });
@@ -26,9 +27,9 @@ export default function PlayerList() {
             {p.socketId === state.me?.socketId && <span className={styles.you}> (you)</span>}
           </span>
           {state.phase !== 'lobby' && (
-            <span className={styles.score}>{p.score} pts</span>
+            <span className={styles.score}>{scores[p.nickname] ?? 0} pts</span>
           )}
-          {isHost && inLobby && p.socketId !== state.me?.socketId && !p.disconnected && (
+          {isHost && inLobby && p.socketId !== state.me?.socketId && (
             <button
               className={styles.kickBtn}
               onClick={() => kick(p.socketId)}

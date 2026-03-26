@@ -1,8 +1,8 @@
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 24px;
+  gap: 16px;
+  padding: 20px 24px;
   height: 100%;
   overflow-y: auto;
 }
@@ -11,20 +11,29 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  flex-wrap: wrap;
 }
 
-.roundInfo {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-transform: uppercase;
+.phaseLabel {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--text);
   letter-spacing: 1px;
   flex-shrink: 0;
 }
 
+.category {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text);
+  text-align: right;
+  flex-shrink: 0;
+}
+
 .instructions {
+  text-align: center;
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 
 .form {
@@ -41,7 +50,17 @@
 .input {
   flex: 1;
   font-size: 18px;
-  padding: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  font-family: var(--font-main);
+}
+
+.input::placeholder {
+  color: #888;
 }
 
 .meta {
@@ -49,6 +68,7 @@
   justify-content: space-between;
   font-size: 12px;
   color: var(--text-muted);
+  padding: 0 4px;
 }
 
 .matchOk { color: var(--success); }
@@ -64,9 +84,10 @@
 }
 
 .submittedText {
-  font-size: 24px;
+  font-size: 28px;
   color: var(--success);
   font-family: var(--font-display);
+  letter-spacing: 2px;
 }
 
 .waiting {

@@ -1,20 +1,15 @@
 import { useGame } from '../../context/GameContext.jsx';
 import socket from '../../socket/socketClient.js';
 import { EVENTS } from '../../socket/events.js';
-import AcronymDisplay from './AcronymDisplay.jsx';
 import Countdown from './Countdown.jsx';
 import styles from './VotingPhase.module.css';
 
 export default function VotingPhase() {
   const { state } = useGame();
-  const { round, hasVoted, hasSubmitted, me } = state;
+  const { round, hasVoted, me } = state;
 
   const isSpectator = me?.isSpectator;
   const canVote = !isSpectator && !hasVoted;
-
-  // Find my own anonId so I can disable voting for it
-  // Server doesn't reveal which anonId is mine, but we know our own submission text
-  // So we just disable nothing — server enforces anti-self-vote
 
   function vote(anonId) {
     if (!canVote) return;
@@ -42,13 +37,10 @@ export default function VotingPhase() {
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <span className={styles.roundInfo}>
-          Round {round.roundNumber}/{round.totalRounds} — {round.category?.label}
-        </span>
+        <span className={styles.phaseLabel}>Voting Round</span>
         <Countdown phaseEndsAt={round.phaseEndsAt} total={30} />
+        <span className={styles.category}>{round.category?.label}</span>
       </div>
-
-      <AcronymDisplay acronym={round.acronym} />
 
       <p className={styles.instructions}>
         {isSpectator
@@ -68,7 +60,7 @@ export default function VotingPhase() {
         {round.answers?.map((answer) => (
           <button
             key={answer.anonId}
-            className={`${styles.answerCard} ${hasVoted ? styles.disabled : ''}`}
+            className={styles.answerCard}
             onClick={() => vote(answer.anonId)}
             disabled={hasVoted || isSpectator}
           >

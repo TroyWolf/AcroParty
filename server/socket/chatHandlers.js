@@ -17,8 +17,9 @@ export function registerChatHandlers(io, socket) {
     const room = RoomManager.getRoom(socket.roomCode);
     if (!room) return;
 
+    const spectatorNickname = room.spectators.get(socket.id);
     const player = room.players.get(socket.id)
-      ?? (room.spectators.has(socket.id) ? { nickname: 'Spectator' } : null);
+      ?? (spectatorNickname ? { nickname: spectatorNickname } : null);
     if (!player) return;
 
     const sanitized = sanitizeChat(text);

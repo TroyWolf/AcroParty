@@ -29,11 +29,12 @@ export default function SubmissionPhase() {
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <span className={styles.roundInfo}>
-          Round {round.roundNumber}/{round.totalRounds} &mdash; {round.category?.label}
-        </span>
+        <span className={styles.phaseLabel}>{letters.length} Letter Round</span>
         <Countdown phaseEndsAt={round.phaseEndsAt} total={60} />
+        <span className={styles.category}>{round.category?.label}</span>
       </div>
+
+      <p className={styles.instructions}>Type your answer and press Enter</p>
 
       <AcronymDisplay acronym={round.acronym} />
 
@@ -54,9 +55,6 @@ export default function SubmissionPhase() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className={styles.form}>
-          <p className={styles.instructions}>
-            Make up {letters.length} words — one for each letter!
-          </p>
           <div className={styles.inputRow}>
             <input
               ref={inputRef}

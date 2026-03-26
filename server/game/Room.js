@@ -26,8 +26,8 @@ export function createRoom({ code, hostSocketId }) {
 
     // Map<socketId, Player>
     players: new Map(),
-    // Set<socketId>
-    spectators: new Set(),
+    // Map<socketId, nickname>
+    spectators: new Map(),
 
     currentRound: 0,
     currentRoundState: null,
@@ -59,7 +59,9 @@ export function createRoundState({ roundNumber, category, acronym }) {
 
 /** Serialize room for sending to clients — strips Maps/Sets and server-only fields */
 export function serializeRoom(room, viewerSocketId = null) {
-  const players = [...room.players.values()].map(p => serializePlayer(p));
+  const players = [...room.players.values()]
+    .filter(p => p.disconnectedAt === null)
+    .map(p => serializePlayer(p));
 
   return {
     code: room.code,

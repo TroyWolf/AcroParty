@@ -14,21 +14,26 @@
   font-size: 14px;
   letter-spacing: 2px;
   text-transform: uppercase;
+  font-family: var(--font-display);
 }
 
 .categoryLabel {
   color: var(--text-dim);
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
 }
 
 .categoryName {
-  font-size: 56px;
+  font-family: var(--font-display);
+  font-size: 64px;
   color: var(--accent2);
   text-align: center;
-  text-shadow: 0 0 20px var(--accent2);
+  text-shadow:
+    0 0 20px var(--accent2),
+    0 0 40px rgba(0, 255, 255, 0.3);
   animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  letter-spacing: 2px;
 }
 
 .hint {

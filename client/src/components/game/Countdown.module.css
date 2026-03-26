@@ -1,16 +1,35 @@
 .wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 160px;
+  height: 10px;
+  background: #1a0a0a;
+  border: 1px solid #440000;
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.fill {
+  height: 100%;
+  background: var(--danger);
+  transition: width 1s linear;
+  border-radius: 2px;
 }
 
 .number {
   font-family: var(--font-display);
-  font-size: 40px;
-  color: var(--accent2);
-  min-width: 56px;
+  font-size: 28px;
+  color: var(--text);
+  min-width: 36px;
   text-align: right;
-  transition: color var(--transition);
+  line-height: 1;
 }
 
 .urgent .number {
@@ -18,27 +37,7 @@
   animation: pulse 0.5s ease-in-out infinite alternate;
 }
 
-.bar {
-  flex: 1;
-  height: 12px;
-  background: var(--bg-dark);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.fill {
-  height: 100%;
-  background: var(--accent2);
-  transition: width 1s linear, background 0.3s;
-  border-radius: 6px;
-}
-
-.urgent .fill {
-  background: var(--danger);
-}
-
 @keyframes pulse {
   from { transform: scale(1); }
-  to   { transform: scale(1.1); }
+  to   { transform: scale(1.15); }
 }

@@ -22,7 +22,11 @@ export default function ChatPanel() {
 
   return (
     <div className={styles.panel}>
-      <div className={styles.header}>Chat</div>
+      <div className={styles.watermark}>Chat</div>
+      <div className={styles.header}>
+        <span>Chat</span>
+        <span className={styles.acroLabel}>Acro Central</span>
+      </div>
       <div className={styles.messages}>
         {state.chatMessages.map(msg => (
           <div
@@ -32,7 +36,7 @@ export default function ChatPanel() {
             }`}
           >
             {!msg.isSystem && (
-              <span className={styles.nick}>{msg.nickname}</span>
+              <span className={styles.nick}>&lt;{msg.nickname}&gt;</span>
             )}
             <span className={styles.text}>{msg.text}</span>
           </div>
