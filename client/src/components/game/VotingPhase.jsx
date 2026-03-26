@@ -59,7 +59,11 @@ export default function VotingPhase() {
       )}
 
       <div className={styles.answers}>
-        {round.answers?.map((answer) => {
+        {[...(round.answers ?? [])].sort((a, b) => {
+          const aMine = mySubmission && a.text === mySubmission ? 1 : 0;
+          const bMine = mySubmission && b.text === mySubmission ? 1 : 0;
+          return bMine - aMine;
+        }).map((answer) => {
           const isMine = mySubmission && answer.text === mySubmission;
           const isVoted = answer.anonId === votedAnonId;
           return (
