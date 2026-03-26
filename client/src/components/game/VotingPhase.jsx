@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGame } from '../../context/GameContext.jsx';
 import socket from '../../socket/socketClient.js';
 import { EVENTS } from '../../socket/events.js';
@@ -6,13 +7,15 @@ import styles from './VotingPhase.module.css';
 
 export default function VotingPhase() {
   const { state } = useGame();
-  const { round, hasVoted, me } = state;
+  const { round, hasVoted, me, mySubmission } = state;
+  const [votedAnonId, setVotedAnonId] = useState(null);
 
   const isSpectator = me?.isSpectator;
   const canVote = !isSpectator && !hasVoted;
 
   function vote(anonId) {
     if (!canVote) return;
+    setVotedAnonId(anonId);
     socket.emit(EVENTS.GAME_VOTE, { anonId });
   }
 
@@ -39,7 +42,6 @@ export default function VotingPhase() {
       <div className={styles.header}>
         <span className={styles.phaseLabel}>Voting Round</span>
         <Countdown phaseEndsAt={round.phaseEndsAt} total={30} />
-        <span className={styles.category}>{round.category?.label}</span>
       </div>
 
       <p className={styles.instructions}>
@@ -57,16 +59,21 @@ export default function VotingPhase() {
       )}
 
       <div className={styles.answers}>
-        {round.answers?.map((answer) => (
-          <button
-            key={answer.anonId}
-            className={styles.answerCard}
-            onClick={() => vote(answer.anonId)}
-            disabled={hasVoted || isSpectator}
-          >
-            <span className={styles.answerText}>{answer.text}</span>
-          </button>
-        ))}
+        {round.answers?.map((answer) => {
+          const isMine = mySubmission && answer.text === mySubmission;
+          const isVoted = answer.anonId === votedAnonId;
+          return (
+            <button
+              key={answer.anonId}
+              className={`${styles.answerCard} ${isMine ? styles.mine : ''} ${isVoted ? styles.voted : ''}`}
+              onClick={() => vote(answer.anonId)}
+              disabled={hasVoted || isSpectator || isMine}
+            >
+              <span className={styles.answerText}>{answer.text}</span>
+              {isMine && <span className={styles.mineTag}>yours</span>}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

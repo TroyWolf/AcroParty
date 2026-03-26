@@ -21,7 +21,6 @@ export function createRoom({ code, hostSocketId }) {
 
     config: {
       totalRounds: 5,
-      category: 'random',
     },
 
     // Map<socketId, Player>
@@ -40,10 +39,9 @@ export function createRoom({ code, hostSocketId }) {
   };
 }
 
-export function createRoundState({ roundNumber, category, acronym }) {
+export function createRoundState({ roundNumber, acronym }) {
   return {
     roundNumber,
-    category,        // { key, label, hint }
     acronym,         // string of capital letters e.g. "BFHT"
     phaseStartedAt: null,
     phaseEndsAt: null,

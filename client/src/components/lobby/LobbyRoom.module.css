@@ -53,3 +53,20 @@
   font-size: 14px;
   padding: 16px;
 }
+
+.codeCopyHint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.codeClickable {
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.codeClickable:active {
+  opacity: 0.7;
+}

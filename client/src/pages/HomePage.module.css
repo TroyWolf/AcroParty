@@ -87,6 +87,21 @@
   align-items: center;
 }
 
+.urlBanner {
+  text-align: center;
+  font-size: 13px;
+  color: var(--accent2);
+  padding: 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.urlBanner strong {
+  color: var(--accent);
+  letter-spacing: 3px;
+}
+
 .connecting {
   color: var(--text-muted);
   font-size: 13px;

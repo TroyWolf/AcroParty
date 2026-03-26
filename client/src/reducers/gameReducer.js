@@ -4,7 +4,7 @@ export const initialState = {
 
   // Room
   roomCode: null,
-  phase: null,      // null | 'lobby' | 'category_reveal' | 'submission' | 'voting' | 'results' | 'game_over'
+  phase: null,      // null | 'lobby' | 'submission' | 'voting' | 'results' | 'game_over'
 
   // Self
   me: null,         // { socketId, nickname, isHost, isSpectator, score }
@@ -14,13 +14,12 @@ export const initialState = {
   spectatorCount: 0,
 
   // Game config
-  config: { totalRounds: 5, category: 'random' },
+  config: { totalRounds: 5 },
 
   // Current round
   round: {
     roundNumber: 0,
     totalRounds: 0,
-    category: null,
     acronym: null,
     phaseEndsAt: null,
     answers: [],          // anonymized during voting, revealed during results
@@ -36,9 +35,7 @@ export const initialState = {
   // My round state
   hasSubmitted: false,
   hasVoted: false,
-
-  // Available categories (populated on join/create)
-  categories: [],
+  mySubmission: null,   // text the player submitted this round
 
   // Chat
   chatMessages: [],
@@ -61,7 +58,7 @@ export function gameReducer(state, action) {
 
     case 'ROOM_CREATED':
     case 'ROOM_JOINED': {
-      const { room, you, chat = [], categories = [], currentPhase } = action.payload;
+      const { room, you, chat = [], currentPhase } = action.payload;
       const newState = {
         ...state,
         roomCode: room.code,
@@ -71,7 +68,6 @@ export function gameReducer(state, action) {
         spectatorCount: room.spectatorCount,
         config: room.config,
         chatMessages: chat,
-        categories,
         error: null,
       };
       if (currentPhase) {
@@ -129,9 +125,10 @@ export function gameReducer(state, action) {
       };
 
       // Reset per-round player state at start of new round
-      if (phase === 'submission' || phase === 'category_reveal') {
+      if (phase === 'submission') {
         newState.hasSubmitted = false;
         newState.hasVoted = false;
+        newState.mySubmission = null;
       }
 
       // If we're back to lobby after play_again
@@ -157,6 +154,9 @@ export function gameReducer(state, action) {
 
       return newState;
     }
+
+    case 'MY_SUBMISSION':
+      return { ...state, mySubmission: action.payload };
 
     case 'SUBMISSION_ACK':
       return { ...state, hasSubmitted: true };
@@ -195,7 +195,6 @@ function buildRound(prev, payload) {
     ...prev,
     roundNumber: payload.round ?? prev.roundNumber,
     totalRounds: payload.totalRounds ?? prev.totalRounds,
-    category: payload.category ?? prev.category,
     acronym: payload.acronym ?? prev.acronym,
     phaseEndsAt: payload.phaseEndsAt ?? prev.phaseEndsAt,
     answers: payload.answers ?? prev.answers,

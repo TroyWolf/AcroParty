@@ -1,6 +1,5 @@
 import { createRoundState, serializeRoom } from './Room.js';
 import { generateAcronym } from './AcronymGenerator.js';
-import { pickCategory } from './CategoryData.js';
 import { GAME, SCORING } from '../config.js';
 import RoomManager from './RoomManager.js';
 
@@ -10,10 +9,9 @@ export function setIo(io) { _io = io; }
 
 // ─── Phase durations ──────────────────────────────────────────────────────────
 const PHASE_DURATION = {
-  category_reveal: GAME.CATEGORY_REVEAL_SECONDS * 1000,
-  submission:      GAME.SUBMISSION_SECONDS * 1000,
-  voting:          GAME.VOTING_SECONDS * 1000,
-  results:         GAME.RESULTS_SECONDS * 1000,
+  submission: GAME.SUBMISSION_SECONDS * 1000,
+  voting:     GAME.VOTING_SECONDS * 1000,
+  results:    GAME.RESULTS_SECONDS * 1000,
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -49,12 +47,10 @@ export function startGame(room) {
 
 function startNextRound(room) {
   room.currentRound += 1;
-  const category = pickCategory(room.config.category);
   const acronym = generateAcronym();
 
   room.currentRoundState = createRoundState({
     roundNumber: room.currentRound,
-    category,
     acronym,
   });
 
@@ -64,7 +60,7 @@ function startNextRound(room) {
     p.hasVoted = false;
   }
 
-  transitionPhase(room, 'category_reveal');
+  transitionPhase(room, 'submission');
 }
 
 export function transitionPhase(room, phase) {
@@ -85,24 +81,11 @@ export function transitionPhase(room, phase) {
   }
 
   switch (phase) {
-    case 'category_reveal': {
-      emit(room, 'game:phase_change', {
-        phase: 'category_reveal',
-        round: rs.roundNumber,
-        totalRounds: room.config.totalRounds,
-        category: rs.category,
-        phaseEndsAt: rs.phaseEndsAt,
-      });
-      schedulePhase(room, 'submission', duration);
-      break;
-    }
-
     case 'submission': {
       emit(room, 'game:phase_change', {
         phase: 'submission',
         round: rs.roundNumber,
         totalRounds: room.config.totalRounds,
-        category: rs.category,
         acronym: rs.acronym,
         phaseEndsAt: rs.phaseEndsAt,
       });
@@ -120,7 +103,6 @@ export function transitionPhase(room, phase) {
           round: rs.roundNumber,
           totalRounds: room.config.totalRounds,
           acronym: rs.acronym,
-          category: rs.category,
           answers: [],
           noSubmissions: true,
           phaseEndsAt: now,
@@ -139,7 +121,6 @@ export function transitionPhase(room, phase) {
           round: rs.roundNumber,
           totalRounds: room.config.totalRounds,
           acronym: rs.acronym,
-          category: rs.category,
           answers: [],
           singleSubmission: true,
           phaseEndsAt: now,
@@ -166,7 +147,6 @@ export function transitionPhase(room, phase) {
         round: rs.roundNumber,
         totalRounds: room.config.totalRounds,
         acronym: rs.acronym,
-        category: rs.category,
         answers,
         phaseEndsAt: rs.phaseEndsAt,
       });
@@ -182,7 +162,6 @@ export function transitionPhase(room, phase) {
         round: rs.roundNumber,
         totalRounds: room.config.totalRounds,
         acronym: rs.acronym,
-        category: rs.category,
         answers: result.answers,
         scoreDelta: result.scoreDelta,
         currentScores: result.currentScores,
@@ -191,7 +170,6 @@ export function transitionPhase(room, phase) {
 
       room.rounds.push({
         roundNumber: rs.roundNumber,
-        category: rs.category,
         acronym: rs.acronym,
         answers: result.answers,
         winner: result.roundWinner,

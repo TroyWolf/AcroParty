@@ -3,7 +3,6 @@ import { createPlayer, serializeRoom, serializePlayer } from '../game/Room.js';
 import { sanitizeNickname } from '../utils/sanitize.js';
 import { broadcastSystemChat, handleDisconnect, checkMinPlayers } from '../game/GameEngine.js';
 import { GAME } from '../config.js';
-import { CATEGORIES } from '../game/CategoryData.js';
 
 export function registerRoomHandlers(io, socket) {
   // ── Create room ────────────────────────────────────────────────────────────
@@ -21,7 +20,6 @@ export function registerRoomHandlers(io, socket) {
     socket.emit('room:created', {
       room: serializeRoom(room),
       you: serializePlayer(player),
-      categories: CATEGORIES,
     });
   });
 
@@ -61,7 +59,6 @@ export function registerRoomHandlers(io, socket) {
         room: serializeRoom(room),
         you: { socketId: socket.id, nickname: clean, isSpectator: true },
         chat: room.chat.slice(-50),
-        categories: CATEGORIES,
         currentPhase: phasePayload,
       });
 
@@ -84,7 +81,6 @@ export function registerRoomHandlers(io, socket) {
       room: serializeRoom(room),
       you: serializePlayer(player),
       chat: room.chat.slice(-50),
-      categories: CATEGORIES,
     });
 
     io.to(room.code).emit('room:player_joined', { player: serializePlayer(player) });
@@ -98,16 +94,13 @@ export function registerRoomHandlers(io, socket) {
   });
 
   // ── Host: update config ────────────────────────────────────────────────────
-  socket.on('host:change_config', ({ totalRounds, category } = {}) => {
+  socket.on('host:change_config', ({ totalRounds } = {}) => {
     const room = RoomManager.getRoom(socket.roomCode);
     if (!room || room.phase !== 'lobby') return;
     if (room.hostSocketId !== socket.id) return;
 
     if (typeof totalRounds === 'number') {
       room.config.totalRounds = Math.min(GAME.MAX_ROUNDS, Math.max(GAME.MIN_ROUNDS, totalRounds));
-    }
-    if (typeof category === 'string') {
-      room.config.category = category;
     }
 
     io.to(room.code).emit('room:config_updated', { config: room.config });
@@ -178,7 +171,6 @@ function buildPhaseSnapshot(room) {
     phase: room.phase,
     round: rs.roundNumber,
     totalRounds: room.config.totalRounds,
-    category: rs.category,
     acronym: rs.acronym,
     phaseEndsAt: rs.phaseEndsAt,
   };

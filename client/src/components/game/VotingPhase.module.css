@@ -21,14 +21,6 @@
   flex-shrink: 0;
 }
 
-.category {
-  font-family: var(--font-display);
-  font-size: 18px;
-  color: var(--text);
-  text-align: right;
-  flex-shrink: 0;
-}
-
 .instructions {
   color: var(--accent2);
   font-size: 14px;
@@ -53,11 +45,12 @@
   background: transparent;
   border: none;
   border-radius: 0;
-  padding: 6px 0;
+  padding: 14px 12px;
   text-align: left;
   font-size: 15px;
   cursor: pointer;
   width: 100%;
+  min-height: 56px;
   transition: background var(--transition);
   border-bottom: 1px solid rgba(26, 40, 96, 0.4);
 }
@@ -68,7 +61,25 @@
 
 .answerCard:disabled {
   cursor: default;
-  opacity: 0.75;
+}
+
+.answerCard.mine {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.answerCard.voted {
+  background: rgba(0, 255, 255, 0.08);
+  border-bottom-color: var(--accent2);
+}
+
+.mineTag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  padding: 0 8px;
 }
 
 .answerText {

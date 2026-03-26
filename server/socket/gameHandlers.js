@@ -6,7 +6,7 @@ import { serializeRoom } from '../game/Room.js';
 
 export function registerGameHandlers(io, socket) {
   // ── Start game ────────────────────────────────────────────────────────────
-  socket.on('game:start', ({ totalRounds, category } = {}) => {
+  socket.on('game:start', ({ totalRounds } = {}) => {
     const room = RoomManager.getRoom(socket.roomCode);
     if (!room) return;
     if (room.hostSocketId !== socket.id) return;
@@ -23,9 +23,6 @@ export function registerGameHandlers(io, socket) {
 
     if (typeof totalRounds === 'number') {
       room.config.totalRounds = Math.min(GAME.MAX_ROUNDS, Math.max(GAME.MIN_ROUNDS, totalRounds));
-    }
-    if (typeof category === 'string') {
-      room.config.category = category;
     }
 
     startGame(room);
