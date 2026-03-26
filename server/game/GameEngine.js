@@ -1,4 +1,4 @@
-import { createRoundState, serializeRoom } from './Room.js';
+import { createRoundState, createPlayer, serializePlayer, serializeRoom } from './Room.js';
 import { generateAcronym } from './AcronymGenerator.js';
 import { GAME, SCORING } from '../config.js';
 import RoomManager from './RoomManager.js';
@@ -45,7 +45,20 @@ export function startGame(room) {
   startNextRound(room);
 }
 
+export function promotePendingPlayers(room) {
+  if (room.pendingPlayers.size === 0) return;
+  for (const [socketId, nickname] of room.pendingPlayers) {
+    const player = createPlayer({ socketId, nickname });
+    room.players.set(socketId, player);
+    emit(room, 'room:player_joined', { player: serializePlayer(player) });
+    broadcastSystemChat(room, `${nickname} has joined the game.`);
+  }
+  room.pendingPlayers.clear();
+  emit(room, 'room:pending_updated', { pendingPlayers: [] });
+}
+
 function startNextRound(room) {
+  promotePendingPlayers(room);
   room.currentRound += 1;
   const acronym = generateAcronym();
 
@@ -190,6 +203,7 @@ export function transitionPhase(room, phase) {
 
     case 'game_over': {
       room.phase = 'game_over';
+      promotePendingPlayers(room);
       const finalScores = [...room.players.values()]
         .filter(p => !p.isSpectator)
         .sort((a, b) => b.score - a.score)
@@ -386,6 +400,11 @@ function returnToLobby(room) {
   room.currentRound = 0;
   room.currentRoundState = null;
   room.rounds = [];
+  // Promote pending players before resetting so they're included in the lobby
+  for (const [socketId, nickname] of room.pendingPlayers) {
+    room.players.set(socketId, createPlayer({ socketId, nickname }));
+  }
+  room.pendingPlayers.clear();
   for (const p of room.players.values()) {
     p.score = 0;
     p.hasSubmitted = false;
@@ -406,9 +425,13 @@ export function checkMinPlayers(room) {
 export function handleDisconnect(room, socketId) {
   const player = room.players.get(socketId);
   if (!player) {
-    room.spectators.delete(socketId);
-    const spectators = [...room.spectators.entries()].map(([sid, nickname]) => ({ socketId: sid, nickname }));
-    emit(room, 'room:spectators_updated', { spectators });
+    if (room.pendingPlayers.has(socketId)) {
+      room.pendingPlayers.delete(socketId);
+      emit(room, 'room:pending_updated', { pendingPlayers: [...room.pendingPlayers.entries()].map(([sid, nickname]) => ({ socketId: sid, nickname })) });
+    } else {
+      room.spectators.delete(socketId);
+      emit(room, 'room:spectators_updated', { spectators: [...room.spectators.entries()].map(([sid, nickname]) => ({ socketId: sid, nickname })) });
+    }
     return;
   }
 

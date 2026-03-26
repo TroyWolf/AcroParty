@@ -12,6 +12,7 @@ export const initialState = {
   // Players
   players: [],
   spectators: [],
+  pendingPlayers: [],
 
   // Game config
   config: { totalRounds: 5 },
@@ -66,6 +67,7 @@ export function gameReducer(state, action) {
         me: you,
         players: room.players,
         spectators: room.spectators ?? [],
+        pendingPlayers: room.pendingPlayers ?? [],
         config: room.config,
         chatMessages: chat,
         error: null,
@@ -86,7 +88,12 @@ export function gameReducer(state, action) {
     case 'PLAYER_JOINED': {
       const { player } = action.payload;
       if (state.players.find(p => p.socketId === player.socketId)) return state;
-      return { ...state, players: [...state.players, player] };
+      const newState = { ...state, players: [...state.players, player] };
+      if (state.me?.socketId === player.socketId) {
+        newState.me = { ...state.me, ...player, isPending: false };
+        newState.pendingPlayers = state.pendingPlayers.filter(p => p.socketId !== player.socketId);
+      }
+      return newState;
     }
 
     case 'PLAYER_LEFT': {
@@ -117,6 +124,9 @@ export function gameReducer(state, action) {
     case 'SPECTATORS_UPDATED':
       return { ...state, spectators: action.payload.spectators };
 
+    case 'PENDING_UPDATED':
+      return { ...state, pendingPlayers: action.payload.pendingPlayers };
+
     case 'PHASE_CHANGE': {
       const payload = action.payload;
       const phase = payload.phase;
@@ -138,7 +148,9 @@ export function gameReducer(state, action) {
       if (phase === 'lobby') {
         newState.players = payload.room?.players ?? state.players;
         newState.spectators = payload.room?.spectators ?? state.spectators;
+        newState.pendingPlayers = payload.room?.pendingPlayers ?? [];
         newState.config = payload.room?.config ?? state.config;
+        if (state.me?.isPending) newState.me = { ...state.me, isPending: false };
         newState.round = initialState.round;
         newState.hasSubmitted = false;
         newState.hasVoted = false;

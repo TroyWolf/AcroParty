@@ -38,8 +38,10 @@ export default function SubmissionPhase() {
 
       <AcronymDisplay acronym={round.acronym} />
 
-      {me?.isSpectator ? (
-        <p className={styles.spectatorNote}>Spectators can&apos;t submit answers.</p>
+      {me?.isSpectator || me?.isPending ? (
+        <p className={styles.spectatorNote}>
+          {me?.isPending ? 'You\'ll join as a player next round.' : 'Spectators can\'t submit answers.'}
+        </p>
       ) : hasSubmitted ? (
         <div className={styles.submitted}>
           <p className={styles.submittedText}>Answer submitted!</p>

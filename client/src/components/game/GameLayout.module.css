@@ -38,6 +38,17 @@
   border-color: var(--accent2);
 }
 
+.pendingBanner {
+  background: rgba(0, 255, 255, 0.08);
+  border-bottom: 1px solid var(--accent2);
+  color: var(--accent2);
+  font-size: 12px;
+  text-align: center;
+  padding: 6px 16px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
 /* ── Desktop layout (≥768px): 3-column grid ─────────────────────────────── */
 
 .desktopWrapper {

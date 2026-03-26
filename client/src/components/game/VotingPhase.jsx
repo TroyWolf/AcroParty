@@ -10,7 +10,7 @@ export default function VotingPhase() {
   const { round, hasVoted, me, mySubmission } = state;
   const [votedAnonId, setVotedAnonId] = useState(null);
 
-  const isSpectator = me?.isSpectator;
+  const isSpectator = me?.isSpectator || me?.isPending;
   const canVote = !isSpectator && !hasVoted;
 
   function vote(anonId) {
@@ -45,11 +45,13 @@ export default function VotingPhase() {
       </div>
 
       <p className={styles.instructions}>
-        {isSpectator
-          ? 'Spectators cannot vote.'
-          : hasVoted
-            ? 'Vote cast! Waiting for others...'
-            : 'Vote for your favorite answer!'}
+        {me?.isPending
+          ? "You'll join as a player next round."
+          : me?.isSpectator
+            ? 'Spectators cannot vote.'
+            : hasVoted
+              ? 'Vote cast! Waiting for others...'
+              : 'Vote for your favorite answer!'}
       </p>
 
       {round.voteCount && (

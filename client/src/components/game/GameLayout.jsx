@@ -69,11 +69,18 @@ export default function GameLayout({ children }) {
     </div>
   );
 
+  const pendingBanner = state.me?.isPending && (
+    <div className={styles.pendingBanner}>
+      Watching this round — you'll join as a player next round
+    </div>
+  );
+
   // Desktop: always show 3-column layout (sidebar | main | chat)
   if (isDesktop) {
     return (
       <div className={styles.desktopWrapper}>
         {topBar}
+        {pendingBanner}
         <div className={styles.desktopLayout}>
           <div className={styles.sidebar}><PlayerList /></div>
           <div className={styles.main}>{children}</div>
@@ -87,6 +94,7 @@ export default function GameLayout({ children }) {
   return (
     <div className={styles.mobileLayout}>
       {topBar}
+      {pendingBanner}
       <div className={styles.tabContent}>
         <div className={activeTab === 'game' ? styles.tabPane : styles.tabPaneHidden}>
           {children}

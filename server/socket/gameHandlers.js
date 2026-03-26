@@ -1,5 +1,5 @@
 import RoomManager from '../game/RoomManager.js';
-import { startGame, handleSubmit, handleVote } from '../game/GameEngine.js';
+import { startGame, handleSubmit, handleVote, promotePendingPlayers } from '../game/GameEngine.js';
 import { sanitizeSubmission } from '../utils/sanitize.js';
 import { GAME } from '../config.js';
 import { serializeRoom } from '../game/Room.js';
@@ -68,6 +68,7 @@ export function registerGameHandlers(io, socket) {
     room.currentRound = 0;
     room.currentRoundState = null;
     room.rounds = [];
+    promotePendingPlayers(room);
     for (const p of room.players.values()) {
       p.score = 0;
       p.hasSubmitted = false;

@@ -42,6 +42,29 @@ export default function PlayerList() {
         </div>
       ))}
 
+      {state.pendingPlayers.length > 0 && (
+        <div className={styles.spectatorSection}>
+          <h3 className={styles.title}>Joining Next Round ({state.pendingPlayers.length})</h3>
+          {state.pendingPlayers.map(p => (
+            <div key={p.socketId} className={styles.player}>
+              <span className={`${styles.name} ${styles.spectatorName}`}>
+                {p.nickname}
+                {p.socketId === state.me?.socketId && <span className={styles.you}> (you)</span>}
+              </span>
+              {isHost && p.socketId !== state.me?.socketId && (
+                <button
+                  className={styles.kickBtn}
+                  onClick={() => kick(p.socketId)}
+                  title="Kick player"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {state.spectators.length > 0 && (
         <div className={styles.spectatorSection}>
           <h3 className={styles.title}>Spectators ({state.spectators.length})</h3>

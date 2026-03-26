@@ -26,6 +26,7 @@ export const EVENTS = {
   ROOM_KICKED:        'room:kicked',
   ROOM_CONFIG_UPDATED:      'room:config_updated',
   ROOM_SPECTATORS_UPDATED:  'room:spectators_updated',
+  ROOM_PENDING_UPDATED:     'room:pending_updated',
 
   // Game — server → client
   GAME_PHASE_CHANGE:      'game:phase_change',

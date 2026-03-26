@@ -37,33 +37,39 @@ export function registerRoomHandlers(io, socket) {
     );
     if (taken) return socket.emit('room:error', { message: 'Nickname already taken.' });
 
-    // Check if game is in progress and they're not rejoining
+    // Check if game is in progress
     const inProgress = !['lobby', 'game_over'].includes(room.phase);
 
-    if (inProgress && !asSpectator) {
-      return socket.emit('room:error', {
-        message: 'Game in progress. Join as spectator?',
-        canSpectate: true,
-      });
-    }
+    if (inProgress) {
+      if (room.players.size >= GAME.MAX_PLAYERS && !asSpectator) {
+        return socket.emit('room:error', { message: 'Room is full.' });
+      }
 
-    if (asSpectator || inProgress) {
-      room.spectators.set(socket.id, clean);
       socket.roomCode = room.code;
       socket.join(room.code);
-
-      // Send current phase state snapshot
       const phasePayload = buildPhaseSnapshot(room);
 
-      socket.emit('room:joined', {
-        room: serializeRoom(room),
-        you: { socketId: socket.id, nickname: clean, isSpectator: true },
-        chat: room.chat.slice(-50),
-        currentPhase: phasePayload,
-      });
-
-      broadcastSystemChat(room, `${clean} joined as a spectator.`);
-      io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
+      if (asSpectator) {
+        room.spectators.set(socket.id, clean);
+        socket.emit('room:joined', {
+          room: serializeRoom(room),
+          you: { socketId: socket.id, nickname: clean, isSpectator: true },
+          chat: room.chat.slice(-50),
+          currentPhase: phasePayload,
+        });
+        broadcastSystemChat(room, `${clean} joined as a spectator.`);
+        io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
+      } else {
+        room.pendingPlayers.set(socket.id, clean);
+        socket.emit('room:joined', {
+          room: serializeRoom(room),
+          you: { socketId: socket.id, nickname: clean, isPending: true },
+          chat: room.chat.slice(-50),
+          currentPhase: phasePayload,
+        });
+        broadcastSystemChat(room, `${clean} will join next round.`);
+        io.to(room.code).emit('room:pending_updated', { pendingPlayers: serializePendingPlayers(room) });
+      }
       return;
     }
 
@@ -113,6 +119,16 @@ export function registerRoomHandlers(io, socket) {
     if (!room) return;
     if (room.hostSocketId !== socket.id) return;
     if (targetSocketId === socket.id) return;
+
+    // Kick pending player (allowed at any time)
+    if (room.pendingPlayers.has(targetSocketId)) {
+      const nickname = room.pendingPlayers.get(targetSocketId);
+      room.pendingPlayers.delete(targetSocketId);
+      io.to(targetSocketId).emit('room:kicked');
+      io.to(room.code).emit('room:pending_updated', { pendingPlayers: serializePendingPlayers(room) });
+      broadcastSystemChat(room, `${nickname} was kicked.`);
+      return;
+    }
 
     // Kick spectator (allowed at any time)
     if (room.spectators.has(targetSocketId)) {
@@ -167,6 +183,9 @@ export function leaveRoom(io, socket) {
         RoomManager.deleteRoom(room.code);
       }
     }
+  } else if (room.pendingPlayers.has(socket.id)) {
+    room.pendingPlayers.delete(socket.id);
+    io.to(room.code).emit('room:pending_updated', { pendingPlayers: serializePendingPlayers(room) });
   } else {
     room.spectators.delete(socket.id);
     io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
@@ -179,6 +198,10 @@ export function leaveRoom(io, socket) {
 
 function serializeSpectators(room) {
   return [...room.spectators.entries()].map(([socketId, nickname]) => ({ socketId, nickname }));
+}
+
+function serializePendingPlayers(room) {
+  return [...room.pendingPlayers.entries()].map(([socketId, nickname]) => ({ socketId, nickname }));
 }
 
 function buildPhaseSnapshot(room) {
