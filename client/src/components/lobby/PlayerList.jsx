@@ -51,6 +51,15 @@ export default function PlayerList() {
                 {s.nickname}
                 {s.socketId === state.me?.socketId && <span className={styles.you}> (you)</span>}
               </span>
+              {isHost && s.socketId !== state.me?.socketId && (
+                <button
+                  className={styles.kickBtn}
+                  onClick={() => kick(s.socketId)}
+                  title="Kick spectator"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ChatPanel from '../chat/ChatPanel.jsx';
 import PlayerList from '../lobby/PlayerList.jsx';
 import { useGame } from '../../context/GameContext.jsx';
@@ -49,13 +49,36 @@ export default function GameLayout({ children }) {
     if (activeTab === 'chat') setUnreadCount(0);
   }, [activeTab]);
 
+  const [urlCopied, setUrlCopied] = useState(false);
+  const copyUrl = useCallback(() => {
+    const url = `${window.location.origin}/${state.roomCode}`;
+    navigator.clipboard?.writeText(url).then(() => {
+      setUrlCopied(true);
+      setTimeout(() => setUrlCopied(false), 1500);
+    });
+  }, [state.roomCode]);
+
+  const topBar = (
+    <div className={styles.topBar}>
+      <span className={styles.topBarBrand}>ACROPARTY</span>
+      {state.roomCode && (
+        <button className={styles.topBarCopy} onClick={copyUrl} title="Copy join link">
+          {urlCopied ? 'Copied!' : `acroparty.com/${state.roomCode}`}
+        </button>
+      )}
+    </div>
+  );
+
   // Desktop: always show 3-column layout (sidebar | main | chat)
   if (isDesktop) {
     return (
-      <div className={styles.desktopLayout}>
-        <div className={styles.sidebar}><PlayerList /></div>
-        <div className={styles.main}>{children}</div>
-        <div className={styles.desktopChat}><ChatPanel /></div>
+      <div className={styles.desktopWrapper}>
+        {topBar}
+        <div className={styles.desktopLayout}>
+          <div className={styles.sidebar}><PlayerList /></div>
+          <div className={styles.main}>{children}</div>
+          <div className={styles.desktopChat}><ChatPanel /></div>
+        </div>
       </div>
     );
   }
@@ -63,6 +86,7 @@ export default function GameLayout({ children }) {
   // Mobile: tab-based layout with bottom nav (all phases, including lobby)
   return (
     <div className={styles.mobileLayout}>
+      {topBar}
       <div className={styles.tabContent}>
         <div className={activeTab === 'game' ? styles.tabPane : styles.tabPaneHidden}>
           {children}

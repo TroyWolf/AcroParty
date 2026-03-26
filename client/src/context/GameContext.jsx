@@ -40,6 +40,9 @@ export function GameProvider({ children }) {
     on(EVENTS.ROOM_CONFIG_UPDATED, payload =>
       dispatch({ type: 'CONFIG_UPDATED', payload }));
 
+    on(EVENTS.ROOM_SPECTATORS_UPDATED, payload =>
+      dispatch({ type: 'SPECTATORS_UPDATED', payload }));
+
     on(EVENTS.GAME_PHASE_CHANGE, payload =>
       dispatch({ type: 'PHASE_CHANGE', payload }));
 

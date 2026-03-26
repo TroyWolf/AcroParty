@@ -25,7 +25,6 @@ export default function ChatPanel() {
       <div className={styles.watermark}>Chat</div>
       <div className={styles.header}>
         <span>Chat</span>
-        <span className={styles.acroLabel}>Acro Central</span>
       </div>
       <div className={styles.messages}>
         {state.chatMessages.map(msg => (

@@ -114,6 +114,9 @@ export function gameReducer(state, action) {
     case 'CONFIG_UPDATED':
       return { ...state, config: action.payload.config };
 
+    case 'SPECTATORS_UPDATED':
+      return { ...state, spectators: action.payload.spectators };
+
     case 'PHASE_CHANGE': {
       const payload = action.payload;
       const phase = payload.phase;

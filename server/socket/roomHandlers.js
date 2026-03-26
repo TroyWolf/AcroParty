@@ -63,6 +63,7 @@ export function registerRoomHandlers(io, socket) {
       });
 
       broadcastSystemChat(room, `${clean} joined as a spectator.`);
+      io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
       return;
     }
 
@@ -106,13 +107,25 @@ export function registerRoomHandlers(io, socket) {
     io.to(room.code).emit('room:config_updated', { config: room.config });
   });
 
-  // ── Host: kick player ──────────────────────────────────────────────────────
+  // ── Host: kick player or spectator ────────────────────────────────────────
   socket.on('host:kick', ({ targetSocketId } = {}) => {
     const room = RoomManager.getRoom(socket.roomCode);
-    if (!room || room.phase !== 'lobby') return;
+    if (!room) return;
     if (room.hostSocketId !== socket.id) return;
     if (targetSocketId === socket.id) return;
 
+    // Kick spectator (allowed at any time)
+    if (room.spectators.has(targetSocketId)) {
+      const nickname = room.spectators.get(targetSocketId);
+      room.spectators.delete(targetSocketId);
+      io.to(targetSocketId).emit('room:kicked');
+      io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
+      broadcastSystemChat(room, `${nickname} was kicked.`);
+      return;
+    }
+
+    // Kick player (lobby only)
+    if (room.phase !== 'lobby') return;
     const target = room.players.get(targetSocketId);
     if (!target) return;
 
@@ -156,11 +169,16 @@ export function leaveRoom(io, socket) {
     }
   } else {
     room.spectators.delete(socket.id);
+    io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
   }
 
   socket.leave(room.code);
   socket.roomCode = null;
   RoomManager.touch(room);
+}
+
+function serializeSpectators(room) {
+  return [...room.spectators.entries()].map(([socketId, nickname]) => ({ socketId, nickname }));
 }
 
 function buildPhaseSnapshot(room) {

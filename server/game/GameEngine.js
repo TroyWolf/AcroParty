@@ -407,6 +407,8 @@ export function handleDisconnect(room, socketId) {
   const player = room.players.get(socketId);
   if (!player) {
     room.spectators.delete(socketId);
+    const spectators = [...room.spectators.entries()].map(([sid, nickname]) => ({ socketId: sid, nickname }));
+    emit(room, 'room:spectators_updated', { spectators });
     return;
   }
 

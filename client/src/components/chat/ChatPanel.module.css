@@ -34,11 +34,6 @@
   align-items: center;
 }
 
-.acroLabel {
-  color: var(--accent2);
-  font-size: 9px;
-  letter-spacing: 1px;
-}
 
 .messages {
   flex: 1;
