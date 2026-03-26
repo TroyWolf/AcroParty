@@ -34,12 +34,6 @@ export default function LobbyRoom() {
 
       <PlayerList />
 
-      {state.spectatorCount > 0 && (
-        <p className={styles.spectators}>
-          + {state.spectatorCount} spectator{state.spectatorCount !== 1 ? 's' : ''}
-        </p>
-      )}
-
       {isHost ? (
         <HostControls />
       ) : (

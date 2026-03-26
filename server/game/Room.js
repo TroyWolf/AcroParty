@@ -67,7 +67,7 @@ export function serializeRoom(room, viewerSocketId = null) {
     hostSocketId: room.hostSocketId,
     config: { ...room.config },
     players,
-    spectatorCount: room.spectators.size,
+    spectators: [...room.spectators.entries()].map(([socketId, nickname]) => ({ socketId, nickname })),
     currentRound: room.currentRound,
   };
 }

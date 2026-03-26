@@ -41,12 +41,6 @@
   letter-spacing: 2px;
 }
 
-.spectators {
-  color: var(--text-muted);
-  font-size: 12px;
-  text-align: center;
-}
-
 .waiting {
   text-align: center;
   color: var(--text-dim);

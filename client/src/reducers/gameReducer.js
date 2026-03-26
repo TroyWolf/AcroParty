@@ -11,7 +11,7 @@ export const initialState = {
 
   // Players
   players: [],
-  spectatorCount: 0,
+  spectators: [],
 
   // Game config
   config: { totalRounds: 5 },
@@ -65,7 +65,7 @@ export function gameReducer(state, action) {
         phase: room.phase,
         me: you,
         players: room.players,
-        spectatorCount: room.spectatorCount,
+        spectators: room.spectators ?? [],
         config: room.config,
         chatMessages: chat,
         error: null,
@@ -134,6 +134,7 @@ export function gameReducer(state, action) {
       // If we're back to lobby after play_again
       if (phase === 'lobby') {
         newState.players = payload.room?.players ?? state.players;
+        newState.spectators = payload.room?.spectators ?? state.spectators;
         newState.config = payload.room?.config ?? state.config;
         newState.round = initialState.round;
         newState.hasSubmitted = false;

@@ -41,6 +41,20 @@ export default function PlayerList() {
           {p.disconnected && <span className={styles.dc}>disconnected</span>}
         </div>
       ))}
+
+      {state.spectators.length > 0 && (
+        <div className={styles.spectatorSection}>
+          <h3 className={styles.title}>Spectators ({state.spectators.length})</h3>
+          {state.spectators.map(s => (
+            <div key={s.socketId} className={styles.player}>
+              <span className={`${styles.name} ${styles.spectatorName}`}>
+                {s.nickname}
+                {s.socketId === state.me?.socketId && <span className={styles.you}> (you)</span>}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
