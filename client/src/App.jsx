@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { GameProvider, useGame } from './context/GameContext.jsx';
 import HomePage from './pages/HomePage.jsx';
 import RoomPage from './pages/RoomPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
 import IntroScreen from './components/IntroScreen.jsx';
 import { useAudio } from './hooks/useAudio.js';
+
+const ADMIN_MODE = window.location.pathname.toLowerCase() === '/admin';
 
 function parseUrlCode() {
   const code = window.location.pathname.slice(1).toUpperCase();
@@ -16,7 +19,7 @@ function AppInner({ urlCode, muted, toggleMute }) {
   return <RoomPage muted={muted} toggleMute={toggleMute} />;
 }
 
-export default function App() {
+function GameApp() {
   const [showIntro, setShowIntro] = useState(true);
   const { muted, toggleMute } = useAudio('/sounds/Floating-in-Bliss.mp3');
   const urlCode = parseUrlCode();
@@ -27,4 +30,9 @@ export default function App() {
         : <GameProvider><AppInner urlCode={urlCode} muted={muted} toggleMute={toggleMute} /></GameProvider>}
     </>
   );
+}
+
+export default function App() {
+  if (ADMIN_MODE) return <AdminPage />;
+  return <GameApp />;
 }
