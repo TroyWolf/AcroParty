@@ -27,8 +27,6 @@ export default function HostControls() {
 
   return (
     <div className={styles.controls}>
-      <h3 className={styles.title}>Game Settings</h3>
-
       <div className={styles.row}>
         <label className={styles.label}>Rounds</label>
         <select value={rounds} onChange={handleRoundsChange}>

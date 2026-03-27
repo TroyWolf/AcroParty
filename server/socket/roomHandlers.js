@@ -140,8 +140,7 @@ export function registerRoomHandlers(io, socket) {
       return;
     }
 
-    // Kick player (lobby only)
-    if (room.phase !== 'lobby') return;
+    // Kick active player
     const target = room.players.get(targetSocketId);
     if (!target) return;
 
@@ -149,6 +148,7 @@ export function registerRoomHandlers(io, socket) {
     io.to(targetSocketId).emit('room:kicked');
     io.to(room.code).emit('room:player_left', { socketId: targetSocketId, nickname: target.nickname });
     broadcastSystemChat(room, `${target.nickname} was kicked.`);
+    checkMinPlayers(room);
   });
 
   // ── Disconnect ─────────────────────────────────────────────────────────────

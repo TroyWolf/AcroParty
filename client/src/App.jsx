@@ -18,7 +18,7 @@ function AppInner({ urlCode, muted, toggleMute }) {
 
 export default function App() {
   const [showIntro, setShowIntro] = useState(true);
-  const { muted, toggleMute } = useAudio('/sounds/intro-music.mp3');
+  const { muted, toggleMute } = useAudio('/sounds/Floating-in-Bliss.mp3');
   const urlCode = parseUrlCode();
   return (
     <>
