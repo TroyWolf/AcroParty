@@ -5,6 +5,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { setIo } from './game/GameEngine.js';
 import { registerSocketHandlers } from './socket/index.js';
+import adminRouter from './routes/admin.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT ?? 3001;
@@ -27,6 +28,7 @@ setIo(io);
 registerSocketHandlers(io);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
+app.use('/admin', adminRouter);
 
 // Serve built client in production
 if (!isDev) {
