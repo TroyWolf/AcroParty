@@ -101,6 +101,13 @@
 }
 
 @media (max-width: 767px) {
+  .title {
+    font-size: 40px;
+    letter-spacing: 4px;
+    text-align: center;
+    width: 100%;
+  }
+
   .playAgainBtn {
     width: 100%;
     max-width: 400px;
