@@ -128,4 +128,12 @@ Pull requests are welcome! If you find a bug or have a feature idea, open an iss
 
 ---
 
+## Other Versions of the Game
+
+Other attempts to bring Acrophobia back:
+
+- [Acronymo.us](https://www.acronymo.us/) — browser-based multiplayer acronym game
+
+---
+
 *In memory of the original Acrophobia and the weird, wonderful communities that formed around it.*
