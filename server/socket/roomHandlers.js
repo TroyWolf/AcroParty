@@ -3,6 +3,7 @@ import { createPlayer, serializeRoom, serializePlayer } from '../game/Room.js';
 import { sanitizeNickname } from '../utils/sanitize.js';
 import { broadcastSystemChat, handleDisconnect, checkMinPlayers } from '../game/GameEngine.js';
 import { GAME } from '../config.js';
+import { log } from '../logger.js';
 
 export function registerRoomHandlers(io, socket) {
   // ── Create room ────────────────────────────────────────────────────────────
@@ -21,6 +22,7 @@ export function registerRoomHandlers(io, socket) {
       room: serializeRoom(room),
       you: serializePlayer(player),
     });
+    log('CREATE', { room: room.code, player: clean });
   });
 
   // ── Join room ──────────────────────────────────────────────────────────────
@@ -59,6 +61,7 @@ export function registerRoomHandlers(io, socket) {
         });
         broadcastSystemChat(room, `${clean} joined as a spectator.`);
         io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
+        log('JOIN_SPECTATOR', { room: room.code, player: clean });
       } else {
         room.pendingPlayers.set(socket.id, clean);
         socket.emit('room:joined', {
@@ -93,6 +96,7 @@ export function registerRoomHandlers(io, socket) {
     io.to(room.code).emit('room:player_joined', { player: serializePlayer(player) });
     broadcastSystemChat(room, `${clean} joined the room.`);
     RoomManager.touch(room);
+    log('JOIN', { room: room.code, player: clean });
   });
 
   // ── Leave room ─────────────────────────────────────────────────────────────
