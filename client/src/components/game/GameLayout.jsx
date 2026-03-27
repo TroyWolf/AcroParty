@@ -58,7 +58,7 @@ export default function GameLayout({ children, muted, toggleMute }) {
     });
   }, [state.roomCode]);
 
-  const topBar = (
+  const topBar = (isDesktop) => (
     <div className={styles.topBar}>
       <span className={styles.topBarBrand}>
         <span className={styles.topBarAcro}>ACRO</span><span className={styles.topBarParty}>PARTY</span>
@@ -68,13 +68,15 @@ export default function GameLayout({ children, muted, toggleMute }) {
           {urlCopied ? 'Copied!' : `acroparty.com/${state.roomCode}`}
         </button>
       )}
-      <button
-        className={`${styles.topBarMute}${muted ? ` ${styles.topBarMuteMuted}` : ''}`}
-        onClick={toggleMute}
-        title={muted ? 'Unmute music' : 'Mute music'}
-      >
-        ♫
-      </button>
+      {isDesktop && (
+        <button
+          className={`${styles.topBarMute}${muted ? ` ${styles.topBarMuteMuted}` : ''}`}
+          onClick={toggleMute}
+          title={muted ? 'Unmute music' : 'Mute music'}
+        >
+          ♫
+        </button>
+      )}
     </div>
   );
 
@@ -88,7 +90,7 @@ export default function GameLayout({ children, muted, toggleMute }) {
   if (isDesktop) {
     return (
       <div className={styles.desktopWrapper}>
-        {topBar}
+        {topBar(true)}
         {pendingBanner}
         <div className={styles.desktopLayout}>
           <div className={styles.sidebar}><PlayerList /></div>
@@ -102,7 +104,7 @@ export default function GameLayout({ children, muted, toggleMute }) {
   // Mobile: tab-based layout with bottom nav (all phases, including lobby)
   return (
     <div className={styles.mobileLayout}>
-      {topBar}
+      {topBar(false)}
       {pendingBanner}
       <div className={styles.tabContent}>
         <div className={activeTab === 'game' ? styles.tabPane : styles.tabPaneHidden}>

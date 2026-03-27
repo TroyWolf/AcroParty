@@ -4,7 +4,6 @@ import HomePage from './pages/HomePage.jsx';
 import RoomPage from './pages/RoomPage.jsx';
 import IntroScreen from './components/IntroScreen.jsx';
 import { useAudio } from './hooks/useAudio.js';
-import styles from './App.module.css';
 
 function parseUrlCode() {
   const code = window.location.pathname.slice(1).toUpperCase();
@@ -13,7 +12,7 @@ function parseUrlCode() {
 
 function AppInner({ urlCode, muted, toggleMute }) {
   const { state } = useGame();
-  if (!state.roomCode) return <HomePage urlCode={urlCode} />;
+  if (!state.roomCode) return <HomePage urlCode={urlCode} muted={muted} toggleMute={toggleMute} />;
   return <RoomPage muted={muted} toggleMute={toggleMute} />;
 }
 
@@ -26,13 +25,6 @@ export default function App() {
       {showIntro
         ? <IntroScreen onDone={() => setShowIntro(false)} />
         : <GameProvider><AppInner urlCode={urlCode} muted={muted} toggleMute={toggleMute} /></GameProvider>}
-      <button
-        className={`${styles.muteBtn}${muted ? ` ${styles.muteBtnMuted}` : ''}`}
-        onClick={toggleMute}
-        title={muted ? 'Unmute music' : 'Mute music'}
-      >
-        ♫
-      </button>
     </>
   );
 }

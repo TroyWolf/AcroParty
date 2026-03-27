@@ -68,12 +68,6 @@
   opacity: 0.4;
 }
 
-@media (max-width: 767px) {
-  .topBarMute {
-    display: none;
-  }
-}
-
 .pendingBanner {
   background: rgba(0, 255, 255, 0.08);
   border-bottom: 1px solid var(--accent2);
@@ -210,7 +204,11 @@
 }
 
 .navBtnMusic {
-  flex: 0 0 48px;
+  flex: 0 0 52px;
+}
+
+.navBtnMusic .navLabel {
+  font-size: 22px;
 }
 
 .navLabel {

@@ -4,7 +4,7 @@ import socket from '../socket/socketClient.js';
 import { EVENTS } from '../socket/events.js';
 import styles from './HomePage.module.css';
 
-export default function HomePage({ urlCode = null }) {
+export default function HomePage({ urlCode = null, muted, toggleMute }) {
   const { state, dispatch } = useGame();
   const [nickname, setNickname] = useState('');
   const [code, setCode] = useState(urlCode ?? '');
@@ -35,6 +35,15 @@ export default function HomePage({ urlCode = null }) {
 
   return (
     <div className={styles.page}>
+      {toggleMute && (
+        <button
+          className={`${styles.muteBtn}${muted ? ` ${styles.muteBtnMuted}` : ''}`}
+          onClick={toggleMute}
+          title={muted ? 'Unmute music' : 'Mute music'}
+        >
+          ♫
+        </button>
+      )}
       <div className={styles.panel}>
         <h1 className={styles.title}>
           <span style={{ color: '#ff2200', textShadow: '0 0 20px rgba(255,34,0,0.7), 2px 2px 0 #660000' }}>ACRO</span>
