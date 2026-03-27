@@ -22,7 +22,7 @@
   opacity: 0.6;
 }
 
-@media (max-width: 767px) {
+@media (min-width: 768px) {
   .muteBtn {
     display: none;
   }

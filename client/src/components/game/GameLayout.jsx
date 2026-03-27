@@ -68,6 +68,13 @@ export default function GameLayout({ children, muted, toggleMute }) {
           {urlCopied ? 'Copied!' : `acroparty.com/${state.roomCode}`}
         </button>
       )}
+      <button
+        className={`${styles.topBarMute}${muted ? ` ${styles.topBarMuteMuted}` : ''}`}
+        onClick={toggleMute}
+        title={muted ? 'Unmute music' : 'Mute music'}
+      >
+        ♫
+      </button>
     </div>
   );
 

@@ -6,6 +6,7 @@ export function useAudio(src) {
   const [muted, setMuted] = useState(() => localStorage.getItem('musicMuted') === 'true');
 
   useEffect(() => {
+    let active = true;
     const audio = new Audio(src);
     audio.loop = true;
     audio.volume = 0.8;
@@ -13,17 +14,21 @@ export function useAudio(src) {
     audioRef.current = audio;
 
     function tryPlay() {
+      if (!active) return;
       audio.play().then(() => {
-        startedRef.current = true;
+        if (active) startedRef.current = true;
         document.removeEventListener('pointerdown', tryPlay);
       }).catch(() => {});
     }
 
-    audio.play().then(() => { startedRef.current = true; }).catch(() => {
-      document.addEventListener('pointerdown', tryPlay);
+    audio.play().then(() => {
+      if (active) startedRef.current = true;
+    }).catch(() => {
+      if (active) document.addEventListener('pointerdown', tryPlay);
     });
 
     return () => {
+      active = false;
       audio.pause();
       document.removeEventListener('pointerdown', tryPlay);
     };
