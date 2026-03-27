@@ -60,7 +60,9 @@ export default function GameLayout({ children }) {
 
   const topBar = (
     <div className={styles.topBar}>
-      <span className={styles.topBarBrand}>ACROPARTY</span>
+      <span className={styles.topBarBrand}>
+        <span className={styles.topBarAcro}>ACRO</span><span className={styles.topBarParty}>PARTY</span>
+      </span>
       {state.roomCode && (
         <button className={styles.topBarCopy} onClick={copyUrl} title="Copy join link">
           {urlCopied ? 'Copied!' : `acroparty.com/${state.roomCode}`}
