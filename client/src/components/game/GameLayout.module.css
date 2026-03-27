@@ -46,6 +46,34 @@
   border-color: var(--accent2);
 }
 
+.topBarMute {
+  margin-left: auto;
+  font-family: var(--font-main);
+  font-size: 14px;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.topBarMute:hover {
+  color: var(--accent2);
+  border-color: var(--accent2);
+}
+
+.topBarMuteMuted {
+  opacity: 0.4;
+}
+
+@media (max-width: 767px) {
+  .topBarMute {
+    display: none;
+  }
+}
+
 .pendingBanner {
   background: rgba(0, 255, 255, 0.08);
   border-bottom: 1px solid var(--accent2);
@@ -174,6 +202,15 @@
   color: var(--accent);
   background: rgba(255, 255, 0, 0.05);
   border-bottom: 2px solid var(--accent);
+}
+
+.navBtnMuted {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.navBtnMusic {
+  flex: 0 0 48px;
 }
 
 .navLabel {

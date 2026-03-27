@@ -6,7 +6,7 @@ import VotingPhase from '../components/game/VotingPhase.jsx';
 import ResultsPhase from '../components/game/ResultsPhase.jsx';
 import GameOver from '../components/game/GameOver.jsx';
 
-export default function RoomPage() {
+export default function RoomPage({ muted, toggleMute }) {
   const { state } = useGame();
 
   function renderMain() {
@@ -21,7 +21,7 @@ export default function RoomPage() {
   }
 
   return (
-    <GameLayout>
+    <GameLayout muted={muted} toggleMute={toggleMute}>
       {renderMain()}
     </GameLayout>
   );
