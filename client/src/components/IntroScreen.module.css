@@ -175,12 +175,13 @@
 .letter {
   display: inline-block;
   opacity: 0;
-  animation: letterFold 0.35s ease forwards;
+  animation: letterExplode 0.4s cubic-bezier(0.2, 0, 0.3, 1) forwards;
 }
 
-@keyframes letterFold {
-  from { opacity: 0; transform: rotateY(-90deg); }
-  to   { opacity: 1; transform: rotateY(0deg); }
+@keyframes letterExplode {
+  0%   { opacity: 0;   transform: scale(3.5) rotate(-10deg); filter: brightness(8) blur(2px); }
+  45%  { opacity: 1;   transform: scale(1.15) rotate(3deg);  filter: brightness(1.8) blur(0px); }
+  100% { opacity: 1;   transform: scale(1)   rotate(0deg);   filter: brightness(1)  blur(0px); }
 }
 
 /* ── Subtitle ── */
@@ -193,7 +194,7 @@
   color: var(--accent2);
   text-shadow: 0 0 12px rgba(0, 255, 255, 0.7);
   opacity: 0;
-  animation: subtitleFade 0.4s ease 2.9s forwards;
+  animation: subtitleFade 0.4s ease 0.9s forwards;
 }
 
 @keyframes subtitleFade {
