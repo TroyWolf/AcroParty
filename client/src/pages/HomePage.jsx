@@ -4,11 +4,11 @@ import socket from '../socket/socketClient.js';
 import { EVENTS } from '../socket/events.js';
 import styles from './HomePage.module.css';
 
-export default function HomePage() {
+export default function HomePage({ urlCode = null }) {
   const { state, dispatch } = useGame();
   const [nickname, setNickname] = useState('');
-  const [code, setCode] = useState('');
-  const [mode, setMode] = useState('create'); // 'create' | 'join'
+  const [code, setCode] = useState(urlCode ?? '');
+  const [mode, setMode] = useState(urlCode ? 'join' : 'create');
   const [asSpectator, setAsSpectator] = useState(false);
 
   function clearError() {
@@ -38,6 +38,12 @@ export default function HomePage() {
       <div className={styles.panel}>
         <h1 className={styles.title}>ACROPARTY</h1>
         <p className={styles.subtitle}>The Acronym Party Game</p>
+
+        {urlCode && mode === 'join' && (
+          <p className={styles.urlBanner}>
+            Joining room <strong>{urlCode}</strong>
+          </p>
+        )}
 
         <div className={styles.tabs}>
           <button

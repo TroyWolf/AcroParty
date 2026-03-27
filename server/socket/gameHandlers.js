@@ -1,12 +1,12 @@
 import RoomManager from '../game/RoomManager.js';
-import { startGame, handleSubmit, handleVote } from '../game/GameEngine.js';
+import { startGame, handleSubmit, handleVote, promotePendingPlayers } from '../game/GameEngine.js';
 import { sanitizeSubmission } from '../utils/sanitize.js';
 import { GAME } from '../config.js';
 import { serializeRoom } from '../game/Room.js';
 
 export function registerGameHandlers(io, socket) {
   // ── Start game ────────────────────────────────────────────────────────────
-  socket.on('game:start', ({ totalRounds, category } = {}) => {
+  socket.on('game:start', ({ totalRounds } = {}) => {
     const room = RoomManager.getRoom(socket.roomCode);
     if (!room) return;
     if (room.hostSocketId !== socket.id) return;
@@ -23,9 +23,6 @@ export function registerGameHandlers(io, socket) {
 
     if (typeof totalRounds === 'number') {
       room.config.totalRounds = Math.min(GAME.MAX_ROUNDS, Math.max(GAME.MIN_ROUNDS, totalRounds));
-    }
-    if (typeof category === 'string') {
-      room.config.category = category;
     }
 
     startGame(room);
@@ -71,6 +68,7 @@ export function registerGameHandlers(io, socket) {
     room.currentRound = 0;
     room.currentRoundState = null;
     room.rounds = [];
+    promotePendingPlayers(room);
     for (const p of room.players.values()) {
       p.score = 0;
       p.hasSubmitted = false;

@@ -34,11 +34,6 @@
   align-items: center;
 }
 
-.acroLabel {
-  color: var(--accent2);
-  font-size: 9px;
-  letter-spacing: 1px;
-}
 
 .messages {
   flex: 1;
@@ -54,8 +49,8 @@
 .msg {
   display: flex;
   flex-direction: column;
-  font-size: 12px;
-  padding: 2px 4px;
+  font-size: 13px;
+  padding: 3px 4px;
 }
 
 .msg.mine {
@@ -84,7 +79,7 @@
 .form {
   display: flex;
   gap: 4px;
-  padding: 6px 8px;
+  padding: 8px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   position: relative;
@@ -93,11 +88,12 @@
 
 .input {
   flex: 1;
-  padding: 5px 8px;
-  font-size: 12px;
+  padding: 8px 10px;
+  font-size: 14px;
 }
 
 .form button {
-  padding: 5px 10px;
-  font-size: 11px;
+  padding: 8px 14px;
+  font-size: 13px;
+  min-height: 40px;
 }

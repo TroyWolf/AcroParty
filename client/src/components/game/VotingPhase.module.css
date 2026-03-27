@@ -21,14 +21,6 @@
   flex-shrink: 0;
 }
 
-.category {
-  font-family: var(--font-display);
-  font-size: 18px;
-  color: var(--text);
-  text-align: right;
-  flex-shrink: 0;
-}
-
 .instructions {
   color: var(--accent2);
   font-size: 14px;
@@ -43,32 +35,58 @@
 .answers {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
 .answerCard {
   display: flex;
   align-items: center;
   gap: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 6px 0;
+  background: rgba(10, 16, 60, 0.6);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 14px 12px;
   text-align: left;
   font-size: 15px;
   cursor: pointer;
   width: 100%;
-  transition: background var(--transition);
-  border-bottom: 1px solid rgba(26, 40, 96, 0.4);
+  min-height: 56px;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
 
 .answerCard:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(26, 40, 120, 0.7);
+  border-color: var(--accent2);
+  transform: translateX(3px);
+}
+
+.answerCard:active:not(:disabled) {
+  background: rgba(0, 255, 255, 0.1);
 }
 
 .answerCard:disabled {
   cursor: default;
-  opacity: 0.75;
+}
+
+.answerCard.mine {
+  opacity: 0.45;
+  cursor: default;
+  border-style: dashed;
+}
+
+.answerCard.voted {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: var(--accent2);
+  border-width: 2px;
+}
+
+.mineTag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  padding: 0 8px;
 }
 
 .answerText {

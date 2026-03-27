@@ -44,7 +44,7 @@ export default function GameOver() {
       </div>
 
       {me?.isHost && (
-        <button className="primary" onClick={playAgain} style={{ fontSize: '18px', padding: '12px 32px' }}>
+        <button className={`primary ${styles.playAgainBtn}`} onClick={playAgain}>
           PLAY AGAIN
         </button>
       )}

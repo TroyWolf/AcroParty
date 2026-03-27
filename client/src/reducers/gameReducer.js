@@ -4,23 +4,23 @@ export const initialState = {
 
   // Room
   roomCode: null,
-  phase: null,      // null | 'lobby' | 'category_reveal' | 'submission' | 'voting' | 'results' | 'game_over'
+  phase: null,      // null | 'lobby' | 'submission' | 'voting' | 'results' | 'game_over'
 
   // Self
   me: null,         // { socketId, nickname, isHost, isSpectator, score }
 
   // Players
   players: [],
-  spectatorCount: 0,
+  spectators: [],
+  pendingPlayers: [],
 
   // Game config
-  config: { totalRounds: 5, category: 'random' },
+  config: { totalRounds: 5 },
 
   // Current round
   round: {
     roundNumber: 0,
     totalRounds: 0,
-    category: null,
     acronym: null,
     phaseEndsAt: null,
     answers: [],          // anonymized during voting, revealed during results
@@ -36,9 +36,7 @@ export const initialState = {
   // My round state
   hasSubmitted: false,
   hasVoted: false,
-
-  // Available categories (populated on join/create)
-  categories: [],
+  mySubmission: null,   // text the player submitted this round
 
   // Chat
   chatMessages: [],
@@ -61,17 +59,17 @@ export function gameReducer(state, action) {
 
     case 'ROOM_CREATED':
     case 'ROOM_JOINED': {
-      const { room, you, chat = [], categories = [], currentPhase } = action.payload;
+      const { room, you, chat = [], currentPhase } = action.payload;
       const newState = {
         ...state,
         roomCode: room.code,
         phase: room.phase,
         me: you,
         players: room.players,
-        spectatorCount: room.spectatorCount,
+        spectators: room.spectators ?? [],
+        pendingPlayers: room.pendingPlayers ?? [],
         config: room.config,
         chatMessages: chat,
-        categories,
         error: null,
       };
       if (currentPhase) {
@@ -90,7 +88,12 @@ export function gameReducer(state, action) {
     case 'PLAYER_JOINED': {
       const { player } = action.payload;
       if (state.players.find(p => p.socketId === player.socketId)) return state;
-      return { ...state, players: [...state.players, player] };
+      const newState = { ...state, players: [...state.players, player] };
+      if (state.me?.socketId === player.socketId) {
+        newState.me = { ...state.me, ...player, isPending: false };
+        newState.pendingPlayers = state.pendingPlayers.filter(p => p.socketId !== player.socketId);
+      }
+      return newState;
     }
 
     case 'PLAYER_LEFT': {
@@ -118,6 +121,12 @@ export function gameReducer(state, action) {
     case 'CONFIG_UPDATED':
       return { ...state, config: action.payload.config };
 
+    case 'SPECTATORS_UPDATED':
+      return { ...state, spectators: action.payload.spectators };
+
+    case 'PENDING_UPDATED':
+      return { ...state, pendingPlayers: action.payload.pendingPlayers };
+
     case 'PHASE_CHANGE': {
       const payload = action.payload;
       const phase = payload.phase;
@@ -129,15 +138,19 @@ export function gameReducer(state, action) {
       };
 
       // Reset per-round player state at start of new round
-      if (phase === 'submission' || phase === 'category_reveal') {
+      if (phase === 'submission') {
         newState.hasSubmitted = false;
         newState.hasVoted = false;
+        newState.mySubmission = null;
       }
 
       // If we're back to lobby after play_again
       if (phase === 'lobby') {
         newState.players = payload.room?.players ?? state.players;
+        newState.spectators = payload.room?.spectators ?? state.spectators;
+        newState.pendingPlayers = payload.room?.pendingPlayers ?? [];
         newState.config = payload.room?.config ?? state.config;
+        if (state.me?.isPending) newState.me = { ...state.me, isPending: false };
         newState.round = initialState.round;
         newState.hasSubmitted = false;
         newState.hasVoted = false;
@@ -157,6 +170,9 @@ export function gameReducer(state, action) {
 
       return newState;
     }
+
+    case 'MY_SUBMISSION':
+      return { ...state, mySubmission: action.payload };
 
     case 'SUBMISSION_ACK':
       return { ...state, hasSubmitted: true };
@@ -195,7 +211,6 @@ function buildRound(prev, payload) {
     ...prev,
     roundNumber: payload.round ?? prev.roundNumber,
     totalRounds: payload.totalRounds ?? prev.totalRounds,
-    category: payload.category ?? prev.category,
     acronym: payload.acronym ?? prev.acronym,
     phaseEndsAt: payload.phaseEndsAt ?? prev.phaseEndsAt,
     answers: payload.answers ?? prev.answers,

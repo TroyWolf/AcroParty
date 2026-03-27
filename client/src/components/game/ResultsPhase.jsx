@@ -11,7 +11,6 @@ export default function ResultsPhase() {
         <span className={styles.phaseLabel}>
           Round {round.roundNumber}/{round.totalRounds} Results
         </span>
-        <span className={styles.category}>{round.category?.label}</span>
       </div>
 
       <div className={styles.acronymSmall}>

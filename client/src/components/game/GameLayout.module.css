@@ -1,7 +1,75 @@
-.layout {
-  display: grid;
-  grid-template-columns: 180px 1fr 240px;
+/* ── Top bar (both layouts) ──────────────────────────────────────────────── */
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 40px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-dark);
+}
+
+.topBarBrand {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 4px;
+}
+
+.topBarAcro {
+  color: #ff2200;
+  text-shadow: 0 0 10px rgba(255, 34, 0, 0.7), 2px 2px 0 #660000;
+}
+
+.topBarParty {
+  color: #ffff00;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.7), 2px 2px 0 #666600;
+}
+
+.topBarCopy {
+  font-family: var(--font-main);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+
+.topBarCopy:hover {
+  color: var(--accent2);
+  border-color: var(--accent2);
+}
+
+.pendingBanner {
+  background: rgba(0, 255, 255, 0.08);
+  border-bottom: 1px solid var(--accent2);
+  color: var(--accent2);
+  font-size: 12px;
+  text-align: center;
+  padding: 6px 16px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+/* ── Desktop layout (≥768px): 3-column grid ─────────────────────────────── */
+
+.desktopWrapper {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
+  overflow: hidden;
+}
+
+.desktopLayout {
+  display: grid;
+  grid-template-columns: 180px 1fr 280px;
+  flex: 1;
   overflow: hidden;
   gap: 0;
 }
@@ -15,10 +83,9 @@
 
 .main {
   overflow-y: auto;
-  padding: 0;
 }
 
-.chat {
+.desktopChat {
   border-left: 1px solid var(--border);
   overflow: hidden;
   display: flex;
@@ -26,21 +93,111 @@
   background: rgba(4, 4, 12, 0.88);
 }
 
-@media (max-width: 700px) {
-  .layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-  }
+/* ── Mobile: tab layout (all phases) ─────────────────────────────────────── */
 
-  .sidebar {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    max-height: 120px;
-  }
+.mobileLayout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  .chat {
-    border-left: none;
-    border-top: 1px solid var(--border);
-    max-height: 200px;
-  }
+.tabContent {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.tabPane {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+}
+
+/* For panels that manage their own scroll (e.g. ChatPanel) */
+.tabPaneFull {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabPaneHidden {
+  display: none;
+}
+
+.playersTabInner {
+  padding: 16px 12px;
+}
+
+/* ── Bottom navigation bar ────────────────────────────────────────────────── */
+
+.bottomNav {
+  display: flex;
+  border-top: 2px solid var(--border-light);
+  background: var(--bg-dark);
+  flex-shrink: 0;
+  height: var(--nav-height, 52px);
+}
+
+.navBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  transition: color var(--transition), background var(--transition);
+  padding: 0;
+}
+
+.navBtn:last-child {
+  border-right: none;
+}
+
+.navBtn:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.navBtnActive {
+  color: var(--accent);
+  background: rgba(255, 255, 0, 0.05);
+  border-bottom: 2px solid var(--accent);
+}
+
+.navLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.badge {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 22px);
+  background: var(--danger);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  font-family: var(--font-main);
+  line-height: 1;
 }

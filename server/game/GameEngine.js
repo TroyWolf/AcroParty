@@ -1,6 +1,5 @@
-import { createRoundState, serializeRoom } from './Room.js';
+import { createRoundState, createPlayer, serializePlayer, serializeRoom } from './Room.js';
 import { generateAcronym } from './AcronymGenerator.js';
-import { pickCategory } from './CategoryData.js';
 import { GAME, SCORING } from '../config.js';
 import RoomManager from './RoomManager.js';
 
@@ -10,10 +9,9 @@ export function setIo(io) { _io = io; }
 
 // ─── Phase durations ──────────────────────────────────────────────────────────
 const PHASE_DURATION = {
-  category_reveal: GAME.CATEGORY_REVEAL_SECONDS * 1000,
-  submission:      GAME.SUBMISSION_SECONDS * 1000,
-  voting:          GAME.VOTING_SECONDS * 1000,
-  results:         GAME.RESULTS_SECONDS * 1000,
+  submission: GAME.SUBMISSION_SECONDS * 1000,
+  voting:     GAME.VOTING_SECONDS * 1000,
+  results:    GAME.RESULTS_SECONDS * 1000,
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -47,14 +45,25 @@ export function startGame(room) {
   startNextRound(room);
 }
 
+export function promotePendingPlayers(room) {
+  if (room.pendingPlayers.size === 0) return;
+  for (const [socketId, nickname] of room.pendingPlayers) {
+    const player = createPlayer({ socketId, nickname });
+    room.players.set(socketId, player);
+    emit(room, 'room:player_joined', { player: serializePlayer(player) });
+    broadcastSystemChat(room, `${nickname} has joined the game.`);
+  }
+  room.pendingPlayers.clear();
+  emit(room, 'room:pending_updated', { pendingPlayers: [] });
+}
+
 function startNextRound(room) {
+  promotePendingPlayers(room);
   room.currentRound += 1;
-  const category = pickCategory(room.config.category);
   const acronym = generateAcronym();
 
   room.currentRoundState = createRoundState({
     roundNumber: room.currentRound,
-    category,
     acronym,
   });
 
@@ -64,7 +73,7 @@ function startNextRound(room) {
     p.hasVoted = false;
   }
 
-  transitionPhase(room, 'category_reveal');
+  transitionPhase(room, 'submission');
 }
 
 export function transitionPhase(room, phase) {
@@ -85,24 +94,11 @@ export function transitionPhase(room, phase) {
   }
 
   switch (phase) {
-    case 'category_reveal': {
-      emit(room, 'game:phase_change', {
-        phase: 'category_reveal',
-        round: rs.roundNumber,
-        totalRounds: room.config.totalRounds,
-        category: rs.category,
-        phaseEndsAt: rs.phaseEndsAt,
-      });
-      schedulePhase(room, 'submission', duration);
-      break;
-    }
-
     case 'submission': {
       emit(room, 'game:phase_change', {
         phase: 'submission',
         round: rs.roundNumber,
         totalRounds: room.config.totalRounds,
-        category: rs.category,
         acronym: rs.acronym,
         phaseEndsAt: rs.phaseEndsAt,
       });
@@ -120,7 +116,6 @@ export function transitionPhase(room, phase) {
           round: rs.roundNumber,
           totalRounds: room.config.totalRounds,
           acronym: rs.acronym,
-          category: rs.category,
           answers: [],
           noSubmissions: true,
           phaseEndsAt: now,
@@ -139,7 +134,6 @@ export function transitionPhase(room, phase) {
           round: rs.roundNumber,
           totalRounds: room.config.totalRounds,
           acronym: rs.acronym,
-          category: rs.category,
           answers: [],
           singleSubmission: true,
           phaseEndsAt: now,
@@ -166,7 +160,6 @@ export function transitionPhase(room, phase) {
         round: rs.roundNumber,
         totalRounds: room.config.totalRounds,
         acronym: rs.acronym,
-        category: rs.category,
         answers,
         phaseEndsAt: rs.phaseEndsAt,
       });
@@ -182,7 +175,6 @@ export function transitionPhase(room, phase) {
         round: rs.roundNumber,
         totalRounds: room.config.totalRounds,
         acronym: rs.acronym,
-        category: rs.category,
         answers: result.answers,
         scoreDelta: result.scoreDelta,
         currentScores: result.currentScores,
@@ -191,7 +183,6 @@ export function transitionPhase(room, phase) {
 
       room.rounds.push({
         roundNumber: rs.roundNumber,
-        category: rs.category,
         acronym: rs.acronym,
         answers: result.answers,
         winner: result.roundWinner,
@@ -212,6 +203,7 @@ export function transitionPhase(room, phase) {
 
     case 'game_over': {
       room.phase = 'game_over';
+      promotePendingPlayers(room);
       const finalScores = [...room.players.values()]
         .filter(p => !p.isSpectator)
         .sort((a, b) => b.score - a.score)
@@ -408,6 +400,11 @@ function returnToLobby(room) {
   room.currentRound = 0;
   room.currentRoundState = null;
   room.rounds = [];
+  // Promote pending players before resetting so they're included in the lobby
+  for (const [socketId, nickname] of room.pendingPlayers) {
+    room.players.set(socketId, createPlayer({ socketId, nickname }));
+  }
+  room.pendingPlayers.clear();
   for (const p of room.players.values()) {
     p.score = 0;
     p.hasSubmitted = false;
@@ -428,7 +425,13 @@ export function checkMinPlayers(room) {
 export function handleDisconnect(room, socketId) {
   const player = room.players.get(socketId);
   if (!player) {
-    room.spectators.delete(socketId);
+    if (room.pendingPlayers.has(socketId)) {
+      room.pendingPlayers.delete(socketId);
+      emit(room, 'room:pending_updated', { pendingPlayers: [...room.pendingPlayers.entries()].map(([sid, nickname]) => ({ socketId: sid, nickname })) });
+    } else {
+      room.spectators.delete(socketId);
+      emit(room, 'room:spectators_updated', { spectators: [...room.spectators.entries()].map(([sid, nickname]) => ({ socketId: sid, nickname })) });
+    }
     return;
   }
 

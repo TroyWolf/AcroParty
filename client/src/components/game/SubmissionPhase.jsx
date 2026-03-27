@@ -7,7 +7,7 @@ import Countdown from './Countdown.jsx';
 import styles from './SubmissionPhase.module.css';
 
 export default function SubmissionPhase() {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const { round, hasSubmitted, me } = state;
   const [text, setText] = useState('');
   const inputRef = useRef(null);
@@ -19,7 +19,9 @@ export default function SubmissionPhase() {
   function handleSubmit(e) {
     e.preventDefault();
     if (!text.trim() || hasSubmitted || me?.isSpectator) return;
-    socket.emit(EVENTS.GAME_SUBMIT, { text: text.trim() });
+    const trimmed = text.trim();
+    dispatch({ type: 'MY_SUBMISSION', payload: trimmed });
+    socket.emit(EVENTS.GAME_SUBMIT, { text: trimmed });
   }
 
   const letters = round.acronym?.split('') ?? [];
@@ -29,17 +31,17 @@ export default function SubmissionPhase() {
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <span className={styles.phaseLabel}>{letters.length} Letter Round</span>
         <Countdown phaseEndsAt={round.phaseEndsAt} total={60} />
-        <span className={styles.category}>{round.category?.label}</span>
       </div>
 
       <p className={styles.instructions}>Type your answer and press Enter</p>
 
       <AcronymDisplay acronym={round.acronym} />
 
-      {me?.isSpectator ? (
-        <p className={styles.spectatorNote}>Spectators can&apos;t submit answers.</p>
+      {me?.isSpectator || me?.isPending ? (
+        <p className={styles.spectatorNote}>
+          {me?.isPending ? 'You\'ll join as a player next round.' : 'Spectators can\'t submit answers.'}
+        </p>
       ) : hasSubmitted ? (
         <div className={styles.submitted}>
           <p className={styles.submittedText}>Answer submitted!</p>
@@ -68,7 +70,7 @@ export default function SubmissionPhase() {
             <button
               type="submit"
               className="primary"
-              disabled={!text.trim()}
+              disabled={!wordCountMatch}
             >
               Submit
             </button>

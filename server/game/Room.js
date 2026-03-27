@@ -21,13 +21,14 @@ export function createRoom({ code, hostSocketId }) {
 
     config: {
       totalRounds: 5,
-      category: 'random',
     },
 
     // Map<socketId, Player>
     players: new Map(),
-    // Map<socketId, nickname>
+    // Map<socketId, nickname> — watching only, won't play
     spectators: new Map(),
+    // Map<socketId, nickname> — watching current round, become players next round
+    pendingPlayers: new Map(),
 
     currentRound: 0,
     currentRoundState: null,
@@ -40,10 +41,9 @@ export function createRoom({ code, hostSocketId }) {
   };
 }
 
-export function createRoundState({ roundNumber, category, acronym }) {
+export function createRoundState({ roundNumber, acronym }) {
   return {
     roundNumber,
-    category,        // { key, label, hint }
     acronym,         // string of capital letters e.g. "BFHT"
     phaseStartedAt: null,
     phaseEndsAt: null,
@@ -69,7 +69,8 @@ export function serializeRoom(room, viewerSocketId = null) {
     hostSocketId: room.hostSocketId,
     config: { ...room.config },
     players,
-    spectatorCount: room.spectators.size,
+    spectators: [...room.spectators.entries()].map(([socketId, nickname]) => ({ socketId, nickname })),
+    pendingPlayers: [...room.pendingPlayers.entries()].map(([socketId, nickname]) => ({ socketId, nickname })),
     currentRound: room.currentRound,
   };
 }

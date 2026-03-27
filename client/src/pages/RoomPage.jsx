@@ -1,7 +1,6 @@
 import { useGame } from '../context/GameContext.jsx';
 import GameLayout from '../components/game/GameLayout.jsx';
 import LobbyRoom from '../components/lobby/LobbyRoom.jsx';
-import CategoryReveal from '../components/game/CategoryReveal.jsx';
 import SubmissionPhase from '../components/game/SubmissionPhase.jsx';
 import VotingPhase from '../components/game/VotingPhase.jsx';
 import ResultsPhase from '../components/game/ResultsPhase.jsx';
@@ -12,13 +11,12 @@ export default function RoomPage() {
 
   function renderMain() {
     switch (state.phase) {
-      case 'lobby':           return <LobbyRoom />;
-      case 'category_reveal': return <CategoryReveal />;
-      case 'submission':      return <SubmissionPhase />;
-      case 'voting':          return <VotingPhase />;
-      case 'results':         return <ResultsPhase />;
-      case 'game_over':       return <GameOver />;
-      default:                return <LobbyRoom />;
+      case 'lobby':      return <LobbyRoom />;
+      case 'submission': return <SubmissionPhase />;
+      case 'voting':     return <VotingPhase />;
+      case 'results':    return <ResultsPhase />;
+      case 'game_over':  return <GameOver />;
+      default:           return <LobbyRoom />;
     }
   }
 
