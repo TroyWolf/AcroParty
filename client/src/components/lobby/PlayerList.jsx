@@ -6,7 +6,6 @@ import styles from './PlayerList.module.css';
 export default function PlayerList() {
   const { state } = useGame();
   const isHost = state.me?.isHost;
-  const inLobby = state.phase === 'lobby';
   const scores = state.round?.currentScores ?? {};
 
   function kick(targetSocketId) {
@@ -29,7 +28,7 @@ export default function PlayerList() {
           {state.phase !== 'lobby' && (
             <span className={styles.score}>{scores[p.nickname] ?? 0} pts</span>
           )}
-          {isHost && inLobby && p.socketId !== state.me?.socketId && (
+          {isHost && p.socketId !== state.me?.socketId && (
             <button
               className={styles.kickBtn}
               onClick={() => kick(p.socketId)}

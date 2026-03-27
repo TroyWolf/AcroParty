@@ -17,6 +17,7 @@ export default function VotingPhase() {
     if (!canVote) return;
     setVotedAnonId(anonId);
     socket.emit(EVENTS.GAME_VOTE, { anonId });
+    new Audio('/sounds/vote.wav').play().catch(() => {});
   }
 
   if (round.noSubmissions) {

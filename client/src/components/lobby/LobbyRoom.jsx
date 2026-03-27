@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameContext.jsx';
-import PlayerList from './PlayerList.jsx';
 import HostControls from './HostControls.jsx';
 import styles from './LobbyRoom.module.css';
 
@@ -31,8 +30,6 @@ export default function LobbyRoom() {
       {isSpectator && (
         <div className={styles.spectatorBadge}>SPECTATOR MODE</div>
       )}
-
-      <PlayerList />
 
       {isHost ? (
         <HostControls />

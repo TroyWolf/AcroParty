@@ -4,6 +4,7 @@ import socket from '../../socket/socketClient.js';
 import { EVENTS } from '../../socket/events.js';
 import AcronymDisplay from './AcronymDisplay.jsx';
 import Countdown from './Countdown.jsx';
+import { useCountdown } from '../../hooks/useCountdown.js';
 import styles from './SubmissionPhase.module.css';
 
 export default function SubmissionPhase() {
@@ -11,6 +12,23 @@ export default function SubmissionPhase() {
   const { round, hasSubmitted, me } = state;
   const [text, setText] = useState('');
   const inputRef = useRef(null);
+  const countdownSfxRef = useRef(null);
+  const countdownPlayedRef = useRef(false);
+  const remaining = useCountdown(round.phaseEndsAt);
+
+  useEffect(() => {
+    countdownSfxRef.current = new Audio('/sounds/countdown-5s.mp3');
+  }, []);
+
+  useEffect(() => {
+    if (remaining === 6 && !countdownPlayedRef.current) {
+      countdownPlayedRef.current = true;
+      countdownSfxRef.current?.play().catch(() => {});
+    }
+    if (remaining === 0) {
+      countdownPlayedRef.current = false;
+    }
+  }, [remaining]);
 
   useEffect(() => {
     if (!hasSubmitted) inputRef.current?.focus();
@@ -22,6 +40,7 @@ export default function SubmissionPhase() {
     const trimmed = text.trim();
     dispatch({ type: 'MY_SUBMISSION', payload: trimmed });
     socket.emit(EVENTS.GAME_SUBMIT, { text: trimmed });
+    new Audio('/sounds/submission.mp3').play().catch(() => {});
   }
 
   const letters = round.acronym?.split('') ?? [];
