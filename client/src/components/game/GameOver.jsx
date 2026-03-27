@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useGame } from '../../context/GameContext.jsx';
 import socket from '../../socket/socketClient.js';
 import { EVENTS } from '../../socket/events.js';
@@ -6,6 +7,11 @@ import styles from './GameOver.module.css';
 export default function GameOver() {
   const { state } = useGame();
   const { round, me } = state;
+
+  useEffect(() => {
+    const sfx = new Audio('/sounds/winner.mp3');
+    sfx.play().catch(() => {});
+  }, []);
 
   // game_over payload is in round for finalScores and mvp
   const finalScores = state.finalScores ?? [];

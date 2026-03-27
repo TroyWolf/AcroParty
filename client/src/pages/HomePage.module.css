@@ -45,11 +45,12 @@
 }
 
 .title {
-  font-size: 48px;
+  font-size: clamp(28px, 10vw, 48px);
   color: var(--accent);
   text-align: center;
   text-shadow: 0 0 20px var(--accent);
   letter-spacing: 6px;
+  margin-left: -9px;
 }
 
 .subtitle {
