@@ -7,7 +7,7 @@ const SWIRL_MS = 4000;
 const AUTO_ADVANCE_MS = 9500;
 
 const LETTER_POOL = 'ABCDEFGHIJKLMNOPRSTUVWY';
-const COLORS = ['#ff0000', '#ffff00', '#00ffff', '#ff00ff', '#00ff00', '#ff6600', '#ffffff', '#ff0088'];
+const COLORS = ['#ff2200', '#ffff00', '#00ffff', '#ffffff', '#4488ff', '#ff8800'];
 
 function rndLetter() {
   return LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
