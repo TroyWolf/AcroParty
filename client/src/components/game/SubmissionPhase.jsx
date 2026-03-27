@@ -40,6 +40,7 @@ export default function SubmissionPhase() {
     const trimmed = text.trim();
     dispatch({ type: 'MY_SUBMISSION', payload: trimmed });
     socket.emit(EVENTS.GAME_SUBMIT, { text: trimmed });
+    new Audio('/sounds/submission.mp3').play().catch(() => {});
   }
 
   const letters = round.acronym?.split('') ?? [];
