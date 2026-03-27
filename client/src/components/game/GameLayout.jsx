@@ -17,7 +17,7 @@ function useIsDesktop() {
   return isDesktop;
 }
 
-export default function GameLayout({ children }) {
+export default function GameLayout({ children, muted, toggleMute }) {
   const { state } = useGame();
   const isDesktop = useIsDesktop();
   const [activeTab, setActiveTab] = useState('game');
@@ -130,6 +130,13 @@ export default function GameLayout({ children }) {
           {unreadCount > 0 && (
             <span className={styles.badge}>{unreadCount > 9 ? '9+' : unreadCount}</span>
           )}
+        </button>
+        <button
+          className={`${styles.navBtn} ${styles.navBtnMusic}${muted ? ` ${styles.navBtnMuted}` : ''}`}
+          onClick={toggleMute}
+          title={muted ? 'Unmute music' : 'Mute music'}
+        >
+          <span className={styles.navLabel}>♫</span>
         </button>
       </nav>
     </div>

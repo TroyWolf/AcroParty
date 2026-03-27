@@ -176,6 +176,15 @@
   border-bottom: 2px solid var(--accent);
 }
 
+.navBtnMuted {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.navBtnMusic {
+  flex: 0 0 48px;
+}
+
 .navLabel {
   font-size: 11px;
   text-transform: uppercase;
