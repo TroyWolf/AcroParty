@@ -36,7 +36,10 @@ export default function HomePage({ urlCode = null }) {
   return (
     <div className={styles.page}>
       <div className={styles.panel}>
-        <h1 className={styles.title}>ACROPARTY</h1>
+        <h1 className={styles.title}>
+          <span style={{ color: '#ff2200', textShadow: '0 0 20px rgba(255,34,0,0.7), 2px 2px 0 #660000' }}>ACRO</span>
+          <span style={{ color: '#ffff00', textShadow: '0 0 20px rgba(255,255,0,0.7), 2px 2px 0 #666600' }}>PARTY</span>
+        </h1>
         <p className={styles.subtitle}>The Acronym Party Game</p>
 
         {urlCode && mode === 'join' && (

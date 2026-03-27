@@ -6,19 +6,24 @@ const PARTY = 'PARTY'.split('');
 const SWIRL_MS = 4000;
 const AUTO_ADVANCE_MS = 9500;
 
+const LETTER_POOL = 'ABCDEFGHIJKLMNOPRSTUVWY';
+const COLORS = ['#ff2200', '#ffff00', '#00ffff', '#ffffff', '#4488ff', '#ff8800'];
+
+function rndLetter() {
+  return LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
+}
+
 export default function IntroScreen({ onDone }) {
   const [phase, setPhase] = useState('swirl');
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
 
-  // Phase timing
   useEffect(() => {
     const swirl = setTimeout(() => setPhase('reveal'), SWIRL_MS);
     const done  = setTimeout(onDone, AUTO_ADVANCE_MS);
     return () => { clearTimeout(swirl); clearTimeout(done); };
   }, [onDone]);
 
-  // Canvas particle vortex
   useEffect(() => {
     if (phase !== 'swirl') return;
     const canvas = canvasRef.current;
@@ -30,51 +35,95 @@ export default function IntroScreen({ onDone }) {
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
 
-    const particles = Array.from({ length: 70 }, () => ({
-      angle:           Math.random() * Math.PI * 2,
-      radius:          220 + Math.random() * 380,
-      angularVelocity: -(1.8 + Math.random() * 1.2), // clockwise
-      size:            1.5 + Math.random() * 2,
-      alpha:           0.5 + Math.random() * 0.5,
-    }));
+    const letters = Array.from({ length: 52 }, () => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = 180 + Math.random() * Math.min(canvas.width, canvas.height) * 0.42;
+      return {
+        char:      rndLetter(),
+        x:         cx + Math.cos(angle) * dist,
+        y:         cy + Math.sin(angle) * dist,
+        vx:        (Math.random() - 0.5) * 600,
+        vy:        (Math.random() - 0.5) * 600,
+        size:      80 + Math.random() * 140,
+        rotation:  Math.random() * Math.PI * 2,
+        rotSpeed:  (Math.random() - 0.5) * 2.5,
+        color:     COLORS[Math.floor(Math.random() * COLORS.length)],
+        alpha:     0.45 + Math.random() * 0.55,
+        startX:    null,
+        startY:    null,
+      };
+    });
 
     let startTime = null;
+    let lastTs    = null;
+    const CONVERGE_START = 0.65; // fraction of SWIRL_MS when letters start converging
 
     function draw(ts) {
       if (!startTime) startTime = ts;
+      if (!lastTs)    lastTs    = ts;
+      const dt      = Math.min((ts - lastTs) / 1000, 0.05); // seconds, capped
+      lastTs        = ts;
       const elapsed = ts - startTime;
-      const t = Math.min(elapsed / SWIRL_MS, 1);
-      const eased = t * t * t; // cubic ease-in: slow→fast
+      const t       = Math.min(elapsed / SWIRL_MS, 1);
+
+      // ct: 0 during drift, 0→1 during convergence
+      const ct     = t < CONVERGE_START ? 0 : (t - CONVERGE_START) / (1 - CONVERGE_START);
+      const eased  = ct * ct * ct; // cubic ease-in: slow then slam
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (const p of particles) {
-        const r = p.radius * (1 - eased);
-        const θ = p.angle + p.angularVelocity * (elapsed / 1000);
-        const x = cx + r * Math.cos(θ);
-        const y = cy + r * Math.sin(θ);
-        const brightness = 0.25 + eased * 0.75;
-        const sz = p.size * (1 + eased * 2.5);
+      for (const p of letters) {
+        if (t < CONVERGE_START) {
+          // Free drift
+          p.x        += p.vx * dt;
+          p.y        += p.vy * dt;
+          p.rotation += p.rotSpeed * dt;
+          p.startX    = null; // reset so we capture position at converge start
+          p.startY    = null;
+        } else {
+          // Capture position at the moment convergence begins
+          if (p.startX === null) {
+            p.startX = p.x;
+            p.startY = p.y;
+          }
+          // Lerp toward center (cubic ease-in = slow start, fast finish)
+          p.x        = p.startX + (cx - p.startX) * eased;
+          p.y        = p.startY + (cy - p.startY) * eased;
+          p.rotation += p.rotSpeed * dt * (1 + eased * 10);
+        }
 
-        ctx.beginPath();
-        ctx.arc(x, y, sz, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(180, 215, 255, ${p.alpha * brightness})`;
-        ctx.shadowBlur  = 6 + eased * 18;
-        ctx.shadowColor = 'rgba(120, 180, 255, 0.9)';
-        ctx.fill();
+        // Fade out as they slam in (last 20% of convergence)
+        const fadeT = ct > 0.8 ? 1 - (ct - 0.8) / 0.2 : 1;
+        const alpha = p.alpha * fadeT;
+        if (alpha < 0.01) continue;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.globalAlpha  = alpha;
+        ctx.font         = `900 ${p.size}px Impact, 'Arial Narrow', Arial, sans-serif`;
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowBlur   = 10 + eased * 30;
+        ctx.shadowColor  = p.color;
+        ctx.fillStyle    = p.color;
+        ctx.fillText(p.char, 0, 0);
+        ctx.restore();
       }
 
-      // Convergence flash in the final 15%
-      if (t > 0.85) {
-        const ft = (t - 0.85) / 0.15;
-        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 180 * ft + 10);
-        grad.addColorStop(0,   `rgba(255, 255, 255, ${ft * 0.95})`);
-        grad.addColorStop(0.2, `rgba(200, 220, 255, ${ft * 0.6})`);
-        grad.addColorStop(1,   'transparent');
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = grad;
+      // Explosion flash in the final 20% of convergence
+      if (ct > 0.8) {
+        const ft   = (ct - 0.8) / 0.2;
+        const rad  = 30 + 280 * ft;
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+        grad.addColorStop(0,    `rgba(255, 255, 255, ${ft * 0.98})`);
+        grad.addColorStop(0.15, `rgba(220, 230, 255, ${ft * 0.8})`);
+        grad.addColorStop(0.4,  `rgba(160, 180, 255, ${ft * 0.45})`);
+        grad.addColorStop(1,    'transparent');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle   = grad;
         ctx.beginPath();
-        ctx.arc(cx, cy, 180 * ft + 10, 0, Math.PI * 2);
+        ctx.arc(cx, cy, rad, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -105,14 +154,14 @@ export default function IntroScreen({ onDone }) {
           <div className={styles.titleWrap}>
             <span className={styles.acro}>
               {ACRO.map((l, i) => (
-                <span key={i} className={styles.letter} style={{ animationDelay: `${1300 + i * 150}ms` }}>
+                <span key={i} className={styles.letter} style={{ animationDelay: `${i * 60}ms` }}>
                   {l}
                 </span>
               ))}
             </span>
             <span className={styles.party}>
               {PARTY.map((l, i) => (
-                <span key={i} className={styles.letter} style={{ animationDelay: `${1300 + (ACRO.length + i) * 150}ms` }}>
+                <span key={i} className={styles.letter} style={{ animationDelay: `${(ACRO.length + i) * 60}ms` }}>
                   {l}
                 </span>
               ))}
