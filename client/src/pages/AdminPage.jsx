@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './AdminPage.module.css';
 
 const PHASE_LABELS = {
@@ -162,11 +162,18 @@ export default function AdminPage() {
   const [data, setData] = useState(null);
   const [needsSecret, setNeedsSecret] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [logLines, setLogLines] = useState([]);
+  const logTotalRef = useRef(0);
+  const logContainerRef = useRef(null);
+  const logAtBottomRef = useRef(true);
+
+  function adminUrl(path) {
+    return secret ? `/admin/${path}?secret=${encodeURIComponent(secret)}` : `/admin/${path}`;
+  }
 
   const fetchData = useCallback(async () => {
     try {
-      const url = secret ? `/admin/state?secret=${encodeURIComponent(secret)}` : '/admin/state';
-      const res = await fetch(url);
+      const res = await fetch(adminUrl('state'));
       if (res.status === 401) {
         setNeedsSecret(true);
         setData(null);
@@ -179,13 +186,43 @@ export default function AdminPage() {
     } catch {
       // network error — keep stale data
     }
-  }, [secret]);
+  }, [secret]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const fetchLog = useCallback(async () => {
+    try {
+      const after = logTotalRef.current;
+      const path = after > 0 ? `log?after=${after}` : 'log';
+      const res = await fetch(adminUrl(path));
+      if (!res.ok) return;
+      const { lines, total } = await res.json();
+      if (lines.length > 0) {
+        setLogLines(prev => [...prev, ...lines].slice(-500));
+        logTotalRef.current = total;
+      }
+    } catch {
+      // network error — keep stale data
+    }
+  }, [secret]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchData();
-    const id = setInterval(fetchData, 3000);
+    fetchLog();
+    const id = setInterval(() => { fetchData(); fetchLog(); }, 3000);
     return () => clearInterval(id);
-  }, [fetchData]);
+  }, [fetchData, fetchLog]);
+
+  // Auto-scroll log to bottom when new lines arrive, only if already at bottom
+  useEffect(() => {
+    const el = logContainerRef.current;
+    if (!el || !logAtBottomRef.current) return;
+    el.scrollTop = el.scrollHeight;
+  }, [logLines]);
+
+  function handleLogScroll() {
+    const el = logContainerRef.current;
+    if (!el) return;
+    logAtBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+  }
 
   function handleSecretSubmit(value, callback) {
     const newSecret = value;
@@ -280,6 +317,18 @@ export default function AdminPage() {
           )}
         </>
       )}
+
+      <div className={styles.sectionTitle}>SERVER LOG</div>
+      <div
+        className={styles.logContainer}
+        ref={logContainerRef}
+        onScroll={handleLogScroll}
+      >
+        {logLines.length === 0
+          ? <span className={styles.textDim}>No log entries yet.</span>
+          : logLines.map((line, i) => <div key={i} className={styles.logLine}>{line}</div>)
+        }
+      </div>
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { Router } from 'express';
+import { readFileSync, existsSync } from 'fs';
 import RoomManager from '../game/RoomManager.js';
+import { LOG_FILE } from '../logger.js';
 
 const router = Router();
 
@@ -53,6 +55,20 @@ function serializeAdminRoom(room, now) {
     completedRounds: room.rounds,
   };
 }
+
+router.get('/log', adminAuth, (req, res) => {
+  if (!existsSync(LOG_FILE)) return res.json({ lines: [], total: 0 });
+
+  const allLines = readFileSync(LOG_FILE, 'utf8').split('\n').filter(l => l.trim());
+  const total = allLines.length;
+  const after = parseInt(req.query.after ?? '0', 10);
+
+  const lines = after > 0 && after < total
+    ? allLines.slice(after)
+    : allLines.slice(-500);
+
+  res.json({ lines, total });
+});
 
 router.get('/state', adminAuth, (_req, res) => {
   const now = Date.now();
