@@ -4,6 +4,8 @@ export const initialState = {
 
   // Room
   roomCode: null,
+  roomName: null,
+  roomIsPublic: false,
   phase: null,      // null | 'lobby' | 'submission' | 'voting' | 'results' | 'game_over'
 
   // Self
@@ -63,6 +65,8 @@ export function gameReducer(state, action) {
       const newState = {
         ...state,
         roomCode: room.code,
+        roomName: room.name ?? null,
+        roomIsPublic: room.isPublic ?? false,
         phase: room.phase,
         me: you,
         players: room.players,
@@ -119,7 +123,11 @@ export function gameReducer(state, action) {
     }
 
     case 'CONFIG_UPDATED':
-      return { ...state, config: action.payload.config };
+      return {
+        ...state,
+        config: action.payload.config,
+        roomIsPublic: action.payload.isPublic ?? state.roomIsPublic,
+      };
 
     case 'SPECTATORS_UPDATED':
       return { ...state, spectators: action.payload.spectators };

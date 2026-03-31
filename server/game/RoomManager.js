@@ -11,9 +11,9 @@ class RoomManager {
     setInterval(() => this._cleanup(), 60_000);
   }
 
-  createRoom(hostSocketId) {
+  createRoom(hostSocketId, name = null, isPublic = false) {
     const code = generateCode(new Set(this.rooms.keys()));
-    const room = createRoom({ code, hostSocketId });
+    const room = createRoom({ code, hostSocketId, name, isPublic });
     this.rooms.set(code, room);
     return room;
   }

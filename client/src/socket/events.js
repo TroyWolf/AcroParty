@@ -38,4 +38,9 @@ export const EVENTS = {
   // Chat — server → client
   CHAT_MESSAGE_IN:    'chat:message',
   CHAT_HISTORY:       'chat:history',
+
+  // Public rooms — client → server
+  ROOMS_GET_PUBLIC:   'rooms:get_public',
+  // Public rooms — server → client
+  ROOMS_PUBLIC_LIST:  'rooms:public_list',
 };

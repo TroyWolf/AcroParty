@@ -8,6 +8,10 @@ export const LOG_FILE = join(LOG_DIR, 'server.log');
 
 mkdirSync(LOG_DIR, { recursive: true });
 
+export function roomLabel(room) {
+  return room.isPublic ? `Public:${room.code}` : room.code;
+}
+
 export function log(action, fields = {}) {
   const parts = [new Date().toISOString(), action];
   for (const [k, v] of Object.entries(fields)) {

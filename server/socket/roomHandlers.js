@@ -3,15 +3,19 @@ import { createPlayer, serializeRoom, serializePlayer } from '../game/Room.js';
 import { sanitizeNickname } from '../utils/sanitize.js';
 import { broadcastSystemChat, handleDisconnect, checkMinPlayers } from '../game/GameEngine.js';
 import { GAME } from '../config.js';
-import { log } from '../logger.js';
+import { log, roomLabel } from '../logger.js';
 
 export function registerRoomHandlers(io, socket) {
   // ── Create room ────────────────────────────────────────────────────────────
-  socket.on('room:create', ({ nickname } = {}) => {
+  socket.on('room:create', ({ nickname, name, isPublic } = {}) => {
     const clean = sanitizeNickname(nickname ?? '');
     if (!clean) return socket.emit('room:error', { message: 'Invalid nickname.' });
 
-    const room = RoomManager.createRoom(socket.id);
+    const cleanName = typeof name === 'string'
+      ? name.replace(/[<>&"']/g, '').trim().slice(0, 30) || null
+      : null;
+
+    const room = RoomManager.createRoom(socket.id, cleanName, isPublic === true);
     const player = createPlayer({ socketId: socket.id, nickname: clean, isHost: true });
     room.players.set(socket.id, player);
 
@@ -22,7 +26,7 @@ export function registerRoomHandlers(io, socket) {
       room: serializeRoom(room),
       you: serializePlayer(player),
     });
-    log('CREATE', { room: room.code, player: clean });
+    log('CREATE', { room: roomLabel(room), player: clean, ...(room.name && { name: room.name }) });
   });
 
   // ── Join room ──────────────────────────────────────────────────────────────
@@ -61,7 +65,7 @@ export function registerRoomHandlers(io, socket) {
         });
         broadcastSystemChat(room, `${clean} joined as a spectator.`);
         io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
-        log('JOIN_SPECTATOR', { room: room.code, player: clean });
+        log('JOIN_SPECTATOR', { room: roomLabel(room), player: clean });
       } else {
         room.pendingPlayers.set(socket.id, clean);
         socket.emit('room:joined', {
@@ -96,7 +100,7 @@ export function registerRoomHandlers(io, socket) {
     io.to(room.code).emit('room:player_joined', { player: serializePlayer(player) });
     broadcastSystemChat(room, `${clean} joined the room.`);
     RoomManager.touch(room);
-    log('JOIN', { room: room.code, player: clean });
+    log('JOIN', { room: roomLabel(room), player: clean });
   });
 
   // ── Leave room ─────────────────────────────────────────────────────────────
@@ -105,7 +109,7 @@ export function registerRoomHandlers(io, socket) {
   });
 
   // ── Host: update config ────────────────────────────────────────────────────
-  socket.on('host:change_config', ({ totalRounds } = {}) => {
+  socket.on('host:change_config', ({ totalRounds, isPublic } = {}) => {
     const room = RoomManager.getRoom(socket.roomCode);
     if (!room || room.phase !== 'lobby') return;
     if (room.hostSocketId !== socket.id) return;
@@ -113,8 +117,11 @@ export function registerRoomHandlers(io, socket) {
     if (typeof totalRounds === 'number') {
       room.config.totalRounds = Math.min(GAME.MAX_ROUNDS, Math.max(GAME.MIN_ROUNDS, totalRounds));
     }
+    if (typeof isPublic === 'boolean') {
+      room.isPublic = isPublic;
+    }
 
-    io.to(room.code).emit('room:config_updated', { config: room.config });
+    io.to(room.code).emit('room:config_updated', { config: room.config, isPublic: room.isPublic });
   });
 
   // ── Host: kick player or spectator ────────────────────────────────────────
@@ -153,6 +160,19 @@ export function registerRoomHandlers(io, socket) {
     io.to(room.code).emit('room:player_left', { socketId: targetSocketId, nickname: target.nickname });
     broadcastSystemChat(room, `${target.nickname} was kicked.`);
     checkMinPlayers(room);
+  });
+
+  // ── List public rooms ──────────────────────────────────────────────────────
+  socket.on('rooms:get_public', () => {
+    const list = [...RoomManager.rooms.values()]
+      .filter(r => r.isPublic && r.phase === 'lobby')
+      .map(r => ({
+        code: r.code,
+        name: r.name,
+        playerCount: [...r.players.values()].filter(p => p.disconnectedAt === null).length,
+        totalRounds: r.config.totalRounds,
+      }));
+    socket.emit('rooms:public_list', { rooms: list });
   });
 
   // ── Disconnect ─────────────────────────────────────────────────────────────
