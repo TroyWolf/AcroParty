@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 import socket from '../socket/socketClient.js';
 import { EVENTS } from '../socket/events.js';
@@ -10,6 +10,28 @@ export default function HomePage({ urlCode = null, muted, toggleMute }) {
   const [code, setCode] = useState(urlCode ?? '');
   const [mode, setMode] = useState(urlCode ? 'join' : 'create');
   const [asSpectator, setAsSpectator] = useState(false);
+  const [roomName, setRoomName] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
+
+  // Public rooms browser
+  const [publicRooms, setPublicRooms] = useState([]);
+  const [publicLoading, setPublicLoading] = useState(false);
+
+  const fetchPublicRooms = useCallback(() => {
+    if (!state.connected) return;
+    setPublicLoading(true);
+    socket.once(EVENTS.ROOMS_PUBLIC_LIST, ({ rooms }) => {
+      setPublicRooms(rooms);
+      setPublicLoading(false);
+    });
+    socket.emit(EVENTS.ROOMS_GET_PUBLIC);
+  }, [state.connected]);
+
+  useEffect(() => {
+    if (state.connected) {
+      fetchPublicRooms();
+    }
+  }, [state.connected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function clearError() {
     dispatch({ type: 'CLEAR_ERROR' });
@@ -19,7 +41,11 @@ export default function HomePage({ urlCode = null, muted, toggleMute }) {
     e.preventDefault();
     if (!nickname.trim()) return;
     clearError();
-    socket.emit(EVENTS.ROOM_CREATE, { nickname: nickname.trim() });
+    socket.emit(EVENTS.ROOM_CREATE, {
+      nickname: nickname.trim(),
+      name: roomName.trim() || undefined,
+      isPublic,
+    });
   }
 
   function handleJoin(e) {
@@ -31,6 +57,12 @@ export default function HomePage({ urlCode = null, muted, toggleMute }) {
       code: code.trim().toUpperCase(),
       asSpectator,
     });
+  }
+
+  function handleJoinPublic(room) {
+    setCode(room.code);
+    setMode('join');
+    clearError();
   }
 
   return (
@@ -83,6 +115,22 @@ export default function HomePage({ urlCode = null, muted, toggleMute }) {
               placeholder="Enter nickname..."
               autoFocus
             />
+            <label className={styles.label}>Room Name <span className={styles.optional}>(optional)</span></label>
+            <input
+              className={styles.input}
+              value={roomName}
+              onChange={e => setRoomName(e.target.value)}
+              maxLength={30}
+              placeholder="Give your room a name..."
+            />
+            <label className={styles.checkLabel}>
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={e => setIsPublic(e.target.checked)}
+              />
+              &nbsp;Make this room public
+            </label>
             <button type="submit" className="primary" disabled={!nickname.trim() || !state.connected}>
               Create Room
             </button>
@@ -130,6 +178,47 @@ export default function HomePage({ urlCode = null, muted, toggleMute }) {
           <p className={styles.connecting}>Connecting to server<span className="blink">_</span></p>
         )}
       </div>
+
+      {(publicLoading || publicRooms.length > 0) && (
+        <div className={styles.publicRooms}>
+          <div className={styles.publicRoomsHeader}>
+            <h3 className={styles.publicRoomsTitle}>Open Rooms</h3>
+            <button
+              className={styles.refreshBtn}
+              onClick={fetchPublicRooms}
+              disabled={publicLoading || !state.connected}
+            >
+              {publicLoading ? '...' : '↻ Refresh'}
+            </button>
+          </div>
+          {publicLoading ? (
+            <p className={styles.publicRoomsEmpty}>Loading<span className="blink">...</span></p>
+          ) : publicRooms.length === 0 ? (
+            <p className={styles.publicRoomsEmpty}>No open rooms right now.</p>
+          ) : (
+            <ul className={styles.roomList}>
+              {publicRooms.map(room => (
+                <li key={room.code} className={styles.roomRow}>
+                  <div className={styles.roomInfo}>
+                    <span className={styles.roomRowName}>
+                      {room.name || <span className={styles.unnamed}>unnamed</span>}
+                    </span>
+                    <span className={styles.roomRowMeta}>
+                      {room.code} · {room.playerCount}/10 players · {room.totalRounds} rounds
+                    </span>
+                  </div>
+                  <button
+                    className={styles.joinBtn}
+                    onClick={() => handleJoinPublic(room)}
+                  >
+                    Join
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       <div className={styles.howto}>
         <h3>How to Play</h3>

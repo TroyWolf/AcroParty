@@ -40,6 +40,8 @@ function serializeAdminRoom(room, now) {
 
   return {
     code: room.code,
+    name: room.name ?? null,
+    isPublic: room.isPublic ?? false,
     phase: room.phase,
     createdAt: room.createdAt,
     lastActivityAt: room.lastActivityAt,
@@ -63,7 +65,7 @@ router.get('/log', adminAuth, (req, res) => {
   const total = allLines.length;
   const after = parseInt(req.query.after ?? '0', 10);
 
-  const lines = after > 0 && after < total
+  const lines = after > 0
     ? allLines.slice(after)
     : allLines.slice(-500);
 

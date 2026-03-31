@@ -102,6 +102,22 @@
   letter-spacing: 2px;
 }
 
+.roomName {
+  font-size: 14px;
+  color: var(--accent2);
+  letter-spacing: 1px;
+}
+
+.publicBadge {
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-weight: bold;
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+
 .phaseBadge {
   font-size: 10px;
   letter-spacing: 1px;

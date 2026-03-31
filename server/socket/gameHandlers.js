@@ -3,7 +3,7 @@ import { startGame, handleSubmit, handleVote, promotePendingPlayers } from '../g
 import { sanitizeSubmission } from '../utils/sanitize.js';
 import { GAME } from '../config.js';
 import { serializeRoom } from '../game/Room.js';
-import { log } from '../logger.js';
+import { log, roomLabel } from '../logger.js';
 
 export function registerGameHandlers(io, socket) {
   // ── Start game ────────────────────────────────────────────────────────────
@@ -28,7 +28,7 @@ export function registerGameHandlers(io, socket) {
 
     startGame(room);
     log('GAME_START', {
-      room: room.code,
+      room: roomLabel(room),
       host: room.players.get(socket.id).nickname,
       players: activePlayers.length,
       rounds: room.config.totalRounds,

@@ -19,6 +19,7 @@ export default function LobbyRoom() {
   return (
     <div className={styles.lobby}>
       <div className={styles.header}>
+        {state.roomName && <h2 className={styles.roomName}>{state.roomName}</h2>}
         <h2 className={styles.roomCode}>
           Room: <span className={`${styles.code} ${styles.codeClickable}`} onClick={copyCode}>{state.roomCode}</span>
         </h2>

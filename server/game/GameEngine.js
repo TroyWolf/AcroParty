@@ -2,7 +2,7 @@ import { createRoundState, createPlayer, serializePlayer, serializeRoom } from '
 import { generateAcronym } from './AcronymGenerator.js';
 import { GAME, SCORING } from '../config.js';
 import RoomManager from './RoomManager.js';
-import { log } from '../logger.js';
+import { log, roomLabel } from '../logger.js';
 
 // io instance — injected at startup
 let _io = null;
@@ -217,7 +217,7 @@ export function transitionPhase(room, phase) {
         finalScores,
         mvp,
       });
-      log('GAME_OVER', { room: room.code, winner: mvp?.nickname ?? 'none', score: mvp?.score ?? 0 });
+      log('GAME_OVER', { room: roomLabel(room), winner: mvp?.nickname ?? 'none', score: mvp?.score ?? 0 });
       RoomManager.touch(room);
       break;
     }

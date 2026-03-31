@@ -47,6 +47,7 @@ function RoomCard({ room }) {
     <div className={styles.roomCard}>
       <div className={styles.roomHeader}>
         <span className={styles.roomCode}>{room.code}</span>
+        {room.name && <span className={styles.roomName}>{room.name}</span>}
         <span className={`${styles.phaseBadge} ${phaseBadgeClass(room.phase)}`}>
           {PHASE_LABELS[room.phase] ?? room.phase}
         </span>
@@ -55,6 +56,7 @@ function RoomCard({ room }) {
             Round {room.currentRound}/{room.totalRounds}
           </span>
         )}
+        {room.isPublic && <span className={styles.publicBadge}>PUBLIC</span>}
         <span className={styles.roomAge}>age {formatAge(room.ageSeconds)}</span>
       </div>
 
@@ -168,7 +170,9 @@ export default function AdminPage() {
   const logAtBottomRef = useRef(true);
 
   function adminUrl(path) {
-    return secret ? `/admin/${path}?secret=${encodeURIComponent(secret)}` : `/admin/${path}`;
+    if (!secret) return `/admin/${path}`;
+    const sep = path.includes('?') ? '&' : '?';
+    return `/admin/${path}${sep}secret=${encodeURIComponent(secret)}`;
   }
 
   const fetchData = useCallback(async () => {

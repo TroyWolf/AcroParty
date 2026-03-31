@@ -7,16 +7,27 @@ import styles from './HostControls.module.css';
 export default function HostControls() {
   const { state } = useGame();
   const [rounds, setRounds] = useState(state.config.totalRounds);
+  const [isPublic, setIsPublic] = useState(state.roomIsPublic);
 
   // Sync if config changes from server
   useEffect(() => {
     setRounds(state.config.totalRounds);
   }, [state.config]);
 
+  useEffect(() => {
+    setIsPublic(state.roomIsPublic);
+  }, [state.roomIsPublic]);
+
   function handleRoundsChange(e) {
     const val = Number(e.target.value);
     setRounds(val);
     socket.emit(EVENTS.HOST_CHANGE_CONFIG, { totalRounds: val });
+  }
+
+  function handlePublicChange(e) {
+    const val = e.target.checked;
+    setIsPublic(val);
+    socket.emit(EVENTS.HOST_CHANGE_CONFIG, { isPublic: val });
   }
 
   function handleStart() {
@@ -34,6 +45,17 @@ export default function HostControls() {
             <option key={n} value={n}>{n} rounds</option>
           ))}
         </select>
+      </div>
+
+      <div className={styles.row}>
+        <label className={styles.checkLabel}>
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={handlePublicChange}
+          />
+          &nbsp;Public room <span className={styles.checkHint}>(visible in room browser)</span>
+        </label>
       </div>
 
       <button

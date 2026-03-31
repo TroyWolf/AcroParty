@@ -11,9 +11,11 @@ export function createPlayer({ socketId, nickname, isHost = false, isSpectator =
   };
 }
 
-export function createRoom({ code, hostSocketId }) {
+export function createRoom({ code, hostSocketId, name = null, isPublic = false }) {
   return {
     code,
+    name,
+    isPublic,
     phase: 'lobby',
     hostSocketId,
     createdAt: Date.now(),
@@ -65,6 +67,8 @@ export function serializeRoom(room, viewerSocketId = null) {
 
   return {
     code: room.code,
+    name: room.name,
+    isPublic: room.isPublic,
     phase: room.phase,
     hostSocketId: room.hostSocketId,
     config: { ...room.config },
