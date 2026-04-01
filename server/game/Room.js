@@ -23,6 +23,7 @@ export function createRoom({ code, hostSocketId, name = null, isPublic = false }
 
     config: {
       totalRounds: 5,
+      profanityFilter: true,
     },
 
     // Map<socketId, Player>

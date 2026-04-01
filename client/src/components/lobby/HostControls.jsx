@@ -8,10 +8,12 @@ export default function HostControls() {
   const { state } = useGame();
   const [rounds, setRounds] = useState(state.config.totalRounds);
   const [isPublic, setIsPublic] = useState(state.roomIsPublic);
+  const [profanityFilter, setProfanityFilter] = useState(state.config.profanityFilter ?? true);
 
   // Sync if config changes from server
   useEffect(() => {
     setRounds(state.config.totalRounds);
+    setProfanityFilter(state.config.profanityFilter ?? true);
   }, [state.config]);
 
   useEffect(() => {
@@ -28,6 +30,12 @@ export default function HostControls() {
     const val = e.target.checked;
     setIsPublic(val);
     socket.emit(EVENTS.HOST_CHANGE_CONFIG, { isPublic: val });
+  }
+
+  function handleProfanityFilterChange(e) {
+    const val = e.target.checked;
+    setProfanityFilter(val);
+    socket.emit(EVENTS.HOST_CHANGE_CONFIG, { profanityFilter: val });
   }
 
   function handleStart() {
@@ -55,6 +63,17 @@ export default function HostControls() {
             onChange={handlePublicChange}
           />
           &nbsp;Public room <span className={styles.checkHint}>(visible in room browser)</span>
+        </label>
+      </div>
+
+      <div className={styles.row}>
+        <label className={styles.checkLabel}>
+          <input
+            type="checkbox"
+            checked={profanityFilter}
+            onChange={handleProfanityFilterChange}
+          />
+          &nbsp;Profanity filter <span className={styles.checkHint}>(block offensive words)</span>
         </label>
       </div>
 
