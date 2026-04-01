@@ -61,7 +61,9 @@ export default function SubmissionPhase() {
         <Countdown phaseEndsAt={round.phaseEndsAt} total={60} />
       </div>
 
-      <p className={styles.instructions}>Type your answer and press Enter</p>
+      {!(me?.isSpectator || me?.isPending) && (
+        <p className={styles.instructions}>Submit your answer!</p>
+      )}
 
       <AcronymDisplay acronym={round.acronym} />
 
@@ -70,9 +72,20 @@ export default function SubmissionPhase() {
       )}
 
       {!endingMessage && (me?.isSpectator || me?.isPending) ? (
-        <p className={styles.spectatorNote}>
-          {me?.isPending ? 'You\'ll join as a player next round.' : 'Spectators can\'t submit answers.'}
-        </p>
+        <div className={styles.spectatorNote}>
+          {me?.isPending ? (
+            <p>You&apos;ll join as a player next round.</p>
+          ) : (
+            <>
+              <p>Spectating</p>
+              {round.submissionCount && (
+                <p className={styles.count}>
+                  {round.submissionCount.count} / {round.submissionCount.total} submitted
+                </p>
+              )}
+            </>
+          )}
+        </div>
       ) : !endingMessage && hasSubmitted ? (
         <div className={styles.submitted}>
           <p className={styles.submittedText}>Answer submitted!</p>
