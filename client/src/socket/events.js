@@ -31,7 +31,8 @@ export const EVENTS = {
   // Game — server → client
   GAME_PHASE_CHANGE:      'game:phase_change',
   GAME_SUBMISSION_ACK:    'game:submission_ack',
-  GAME_SUBMISSION_COUNT:  'game:submission_count',
+  GAME_SUBMISSION_COUNT:    'game:submission_count',
+  GAME_SUBMISSION_TIME_UP:  'game:submission_time_up',
   GAME_VOTE_ACK:          'game:vote_ack',
   GAME_VOTE_COUNT:        'game:vote_count',
 

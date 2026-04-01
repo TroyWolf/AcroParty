@@ -33,6 +33,7 @@ export const initialState = {
     voteCount: null,
     noSubmissions: false,
     singleSubmission: false,
+    timeUp: false,
   },
 
   // My round state
@@ -194,6 +195,9 @@ export function gameReducer(state, action) {
         round: { ...state.round, submissionCount: action.payload },
       };
 
+    case 'SUBMISSION_TIME_UP':
+      return { ...state, round: { ...state.round, timeUp: true } };
+
     case 'VOTE_COUNT':
       return {
         ...state,
@@ -227,6 +231,7 @@ function buildRound(prev, payload) {
     roundWinner: payload.roundWinner ?? null,
     noSubmissions: payload.noSubmissions ?? false,
     singleSubmission: payload.singleSubmission ?? false,
+    timeUp: false,
     submissionCount: null,
     voteCount: null,
   };

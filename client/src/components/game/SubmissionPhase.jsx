@@ -47,6 +47,14 @@ export default function SubmissionPhase() {
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
   const wordCountMatch = wordCount === letters.length;
 
+  const allSubmitted = round.submissionCount?.allSubmitted;
+  const timeUp = round.timeUp;
+  const endingMessage = allSubmitted
+    ? 'All answers in! Voting starts in 3 seconds.'
+    : timeUp
+    ? 'Time is up! Voting starts in 3 seconds.'
+    : null;
+
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -57,11 +65,15 @@ export default function SubmissionPhase() {
 
       <AcronymDisplay acronym={round.acronym} />
 
-      {me?.isSpectator || me?.isPending ? (
+      {endingMessage && (
+        <p className={styles.endingMessage}>{endingMessage}</p>
+      )}
+
+      {!endingMessage && (me?.isSpectator || me?.isPending) ? (
         <p className={styles.spectatorNote}>
           {me?.isPending ? 'You\'ll join as a player next round.' : 'Spectators can\'t submit answers.'}
         </p>
-      ) : hasSubmitted ? (
+      ) : !endingMessage && hasSubmitted ? (
         <div className={styles.submitted}>
           <p className={styles.submittedText}>Answer submitted!</p>
           <p className={styles.waiting}>
@@ -74,7 +86,7 @@ export default function SubmissionPhase() {
             </p>
           )}
         </div>
-      ) : (
+      ) : !endingMessage && !(me?.isSpectator || me?.isPending) ? (
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputRow}>
             <input
@@ -101,7 +113,7 @@ export default function SubmissionPhase() {
             <span className={styles.charCount}>{text.length}/150</span>
           </div>
         </form>
-      )}
+      ) : null}
     </div>
   );
 }

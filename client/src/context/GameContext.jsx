@@ -59,6 +59,9 @@ export function GameProvider({ children }) {
     on(EVENTS.GAME_SUBMISSION_COUNT, payload =>
       dispatch({ type: 'SUBMISSION_COUNT', payload }));
 
+    on(EVENTS.GAME_SUBMISSION_TIME_UP, () =>
+      dispatch({ type: 'SUBMISSION_TIME_UP' }));
+
     on(EVENTS.GAME_VOTE_ACK, () =>
       dispatch({ type: 'VOTE_ACK' }));
 
