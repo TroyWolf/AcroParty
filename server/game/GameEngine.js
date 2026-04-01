@@ -103,7 +103,11 @@ export function transitionPhase(room, phase) {
         acronym: rs.acronym,
         phaseEndsAt: rs.phaseEndsAt,
       });
-      schedulePhase(room, 'voting', duration);
+      room.currentRoundState.timerHandle = setTimeout(() => {
+        room.currentRoundState.timerHandle = null;
+        emit(room, 'game:submission_time_up', {});
+        schedulePhase(room, 'voting', GAME.ALL_SUBMITTED_BUFFER_MS);
+      }, duration);
       break;
     }
 
@@ -358,11 +362,12 @@ export function handleSubmit(room, socketId, text) {
   // Broadcast updated count
   const total = activePlayers(room).length;
   const count = rs.submissions.size;
-  emit(room, 'game:submission_count', { count, total });
+  const allSubmitted = count >= total;
+  emit(room, 'game:submission_count', { count, total, allSubmitted });
 
-  // If everyone submitted, advance early
-  if (count >= total) {
-    transitionPhase(room, 'voting');
+  // If everyone submitted, advance early after a short buffer
+  if (allSubmitted) {
+    schedulePhase(room, 'voting', GAME.ALL_SUBMITTED_BUFFER_MS);
   }
 
   return { ok: true };
