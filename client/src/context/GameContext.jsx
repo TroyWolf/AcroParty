@@ -25,8 +25,12 @@ export function GameProvider({ children }) {
     on(EVENTS.ROOM_ERROR, payload =>
       dispatch({ type: 'ROOM_ERROR', payload }));
 
-    on(EVENTS.ROOM_PLAYER_JOINED, payload =>
-      dispatch({ type: 'PLAYER_JOINED', payload }));
+    on(EVENTS.ROOM_PLAYER_JOINED, payload => {
+      dispatch({ type: 'PLAYER_JOINED', payload });
+      const sfx = new Audio('/sounds/player-join.mp3');
+      sfx.volume = 1.0;
+      sfx.play().catch(() => {});
+    });
 
     on(EVENTS.ROOM_PLAYER_LEFT, payload =>
       dispatch({ type: 'PLAYER_LEFT', payload }));
