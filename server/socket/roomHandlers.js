@@ -80,6 +80,23 @@ export function registerRoomHandlers(io, socket) {
       return;
     }
 
+    // Lobby — spectator
+    if (asSpectator) {
+      socket.roomCode = room.code;
+      socket.join(room.code);
+      room.spectators.set(socket.id, clean);
+      socket.emit('room:joined', {
+        room: serializeRoom(room),
+        you: { socketId: socket.id, nickname: clean, isSpectator: true },
+        chat: room.chat.slice(-50),
+      });
+      broadcastSystemChat(room, `${clean} joined as a spectator.`);
+      io.to(room.code).emit('room:spectators_updated', { spectators: serializeSpectators(room) });
+      RoomManager.touch(room);
+      log('JOIN_SPECTATOR', { room: roomLabel(room), player: clean });
+      return;
+    }
+
     // Full player — lobby only
     if (room.players.size >= GAME.MAX_PLAYERS) {
       return socket.emit('room:error', { message: 'Room is full.' });
