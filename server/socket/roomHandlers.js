@@ -126,7 +126,7 @@ export function registerRoomHandlers(io, socket) {
   });
 
   // ── Host: update config ────────────────────────────────────────────────────
-  socket.on('host:change_config', ({ totalRounds, isPublic } = {}) => {
+  socket.on('host:change_config', ({ totalRounds, isPublic, profanityFilter } = {}) => {
     const room = RoomManager.getRoom(socket.roomCode);
     if (!room || room.phase !== 'lobby') return;
     if (room.hostSocketId !== socket.id) return;
@@ -136,6 +136,9 @@ export function registerRoomHandlers(io, socket) {
     }
     if (typeof isPublic === 'boolean') {
       room.isPublic = isPublic;
+    }
+    if (typeof profanityFilter === 'boolean') {
+      room.config.profanityFilter = profanityFilter;
     }
 
     io.to(room.code).emit('room:config_updated', { config: room.config, isPublic: room.isPublic });

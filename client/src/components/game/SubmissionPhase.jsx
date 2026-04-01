@@ -9,7 +9,7 @@ import styles from './SubmissionPhase.module.css';
 
 export default function SubmissionPhase() {
   const { state, dispatch } = useGame();
-  const { round, hasSubmitted, me } = state;
+  const { round, hasSubmitted, me, error } = state;
   const [text, setText] = useState('');
   const inputRef = useRef(null);
   const countdownSfxRef = useRef(null);
@@ -39,8 +39,14 @@ export default function SubmissionPhase() {
     if (!text.trim() || hasSubmitted || me?.isSpectator) return;
     const trimmed = text.trim();
     dispatch({ type: 'MY_SUBMISSION', payload: trimmed });
+    dispatch({ type: 'CLEAR_ERROR' });
     socket.emit(EVENTS.GAME_SUBMIT, { text: trimmed });
     new Audio('/sounds/submission.mp3').play().catch(() => {});
+  }
+
+  function handleTextChange(e) {
+    setText(e.target.value);
+    if (error) dispatch({ type: 'CLEAR_ERROR' });
   }
 
   const letters = round.acronym?.split('') ?? [];
@@ -106,7 +112,7 @@ export default function SubmissionPhase() {
               ref={inputRef}
               className={styles.input}
               value={text}
-              onChange={e => setText(e.target.value)}
+              onChange={handleTextChange}
               placeholder={`${letters.length} words...`}
               maxLength={150}
               autoComplete="off"
@@ -125,6 +131,7 @@ export default function SubmissionPhase() {
             </span>
             <span className={styles.charCount}>{text.length}/150</span>
           </div>
+          {error && <p className="error-msg">{error}</p>}
         </form>
       ) : null}
     </div>

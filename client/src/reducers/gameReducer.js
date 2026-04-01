@@ -85,7 +85,7 @@ export function gameReducer(state, action) {
     }
 
     case 'ROOM_ERROR':
-      return { ...state, error: action.payload.message };
+      return { ...state, error: action.payload.message, mySubmission: null };
 
     case 'CLEAR_ERROR':
       return { ...state, error: null };

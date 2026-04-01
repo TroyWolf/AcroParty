@@ -1,6 +1,6 @@
 import RoomManager from '../game/RoomManager.js';
 import { startGame, handleSubmit, handleVote, promotePendingPlayers } from '../game/GameEngine.js';
-import { sanitizeSubmission } from '../utils/sanitize.js';
+import { sanitizeSubmission, containsProfanity } from '../utils/sanitize.js';
 import { GAME } from '../config.js';
 import { serializeRoom } from '../game/Room.js';
 import { log, roomLabel } from '../logger.js';
@@ -42,6 +42,10 @@ export function registerGameHandlers(io, socket) {
 
     const sanitized = sanitizeSubmission(text ?? '');
     if (!sanitized) return socket.emit('room:error', { message: 'Empty submission.' });
+
+    if (room.config.profanityFilter && containsProfanity(sanitized)) {
+      return socket.emit('room:error', { message: 'Submission contains prohibited words.' });
+    }
 
     const result = handleSubmit(room, socket.id, sanitized);
     if (result.error) {
